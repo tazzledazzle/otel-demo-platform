@@ -12,7 +12,7 @@ Deliver interview-ready demo and docs: first make the full demo runnable with te
 
 - [x] **Phase 1: Runnable demo** - Test data and integration steps allow running full demo (infra → API/worker/agent → chat → trace) ✓ 2026-02-25
 - [x] **Phase 2: Interview-ready docs** - Docs cover architecture, use cases, interview script, and one live-coding feature ✓ 2026-02-25
-- [ ] **Phase 3: Live-coding feature** - One pipeline step or small feature implementable live in-session
+- [ ] **Phase 3: Live-coding feature** - One pipeline step or small feature implementable live in-session ✓ planned
 
 ## Phase Details
 
@@ -53,10 +53,10 @@ Plans:
   1. The chosen pipeline step (or small feature) is clearly identified and scoped for in-session implementation.
   2. A candidate can implement it following existing patterns (e.g. new activity or enrichment step).
   3. The change is demonstrable (e.g. visible in trace or in observable behavior).
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- (To be created by plan-phase)
+- [ ] 03-01-PLAN.md — Add new chain step (prompt | llm | step) in chain.py + test
 
 ## Progress
 
