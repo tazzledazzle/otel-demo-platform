@@ -39,10 +39,11 @@ Plans:
   2. Use cases and value of the demo are documented (why OTel, why Temporal, trace visibility).
   3. An interview script exists (order of explain / demo / live-coding, rough timing for ~1hr).
   4. One live-coding feature is described (e.g. which pipeline step to add and where it fits).
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- (To be created by plan-phase)
+- [ ] 02-01-PLAN.md — Complete ARCHITECTURE.md and USE_CASES.md (services, OTel, Temporal, request path; use cases and value)
+- [ ] 02-02-PLAN.md — Complete INTERVIEW_SCRIPT.md and LIVE_FEATURE.md (~1hr order and timing; one live-coding step and where it fits)
 
 ### Phase 3: Live-coding feature
 **Goal**: One pipeline step or small feature can be implemented live in-session and demonstrated.
