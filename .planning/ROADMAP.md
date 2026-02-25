@@ -10,7 +10,7 @@ Deliver interview-ready demo and docs: first make the full demo runnable with te
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Runnable demo** - Test data and integration steps allow running full demo (infra → API/worker/agent → chat → trace)
+- [x] **Phase 1: Runnable demo** - Test data and integration steps allow running full demo (infra → API/worker/agent → chat → trace) ✓ 2026-02-25
 - [ ] **Phase 2: Interview-ready docs** - Docs cover architecture, use cases, interview script, and one live-coding feature
 - [ ] **Phase 3: Live-coding feature** - One pipeline step or small feature implementable live in-session
 
@@ -28,7 +28,7 @@ Deliver interview-ready demo and docs: first make the full demo runnable with te
 **Plans:** 1 plan
 
 Plans:
-- [ ] 01-01-PLAN.md — Complete README and integration/README (start order, health checks, test data, Grafana steps)
+- [x] 01-01-PLAN.md — Complete README and integration/README (start order, health checks, test data, Grafana steps)
 
 ### Phase 2: Interview-ready docs
 **Goal**: Documentation supports a ~1hr interview flow: explain architecture, demo trace, implement one feature.
@@ -63,6 +63,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Runnable demo | 0/TBD | Not started | - |
+| 1. Runnable demo | 1/1 | Complete | 2026-02-25 |
 | 2. Interview-ready docs | 0/TBD | Not started | - |
 | 3. Live-coding feature | 0/TBD | Not started | - |
