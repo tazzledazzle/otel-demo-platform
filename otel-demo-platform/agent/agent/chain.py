@@ -22,7 +22,9 @@ def get_llm():
 def _summarize_step(msg):
     """Runnable step after LLM: pass-through, ensuring result has .content for _Executor."""
     if hasattr(msg, "content"):
-        return AIMessage(content=msg.content)
+        raw = msg.content
+        content = raw if isinstance(raw, str) else ("".join(str(x) for x in raw) if isinstance(raw, list) else str(raw))
+        return AIMessage(content=content)
     return AIMessage(content=str(msg))
 
 
@@ -46,4 +48,6 @@ class _Executor:
     def invoke(self, inputs: dict) -> dict:
         result = self._chain.invoke({"input": inputs["input"]})
         content = result.content if hasattr(result, "content") else str(result)
+        if isinstance(content, list):
+            content = "".join(str(block) for block in content) if content else ""
         return {"output": content}
