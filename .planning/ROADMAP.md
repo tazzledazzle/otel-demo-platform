@@ -25,10 +25,10 @@ Deliver interview-ready demo and docs: first make the full demo runnable with te
   2. Reviewer can start API, worker, and agent and confirm they are healthy (e.g. health endpoints).
   3. Reviewer can send a chat request and receive a response (test data or example request documented).
   4. Reviewer can view the end-to-end trace in Grafana (one trace spanning API, worker, agent/LLM).
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- (To be created by plan-phase)
+- [ ] 01-01-PLAN.md — Complete README and integration/README (start order, health checks, test data, Grafana steps)
 
 ### Phase 2: Interview-ready docs
 **Goal**: Documentation supports a ~1hr interview flow: explain architecture, demo trace, implement one feature.
