@@ -56,7 +56,7 @@ Each task was committed atomically:
 1. **Task 1: Complete root README for runnable demo** - `98d82c6` (feat)
 2. **Task 2: Complete integration/README.md and align with root README** - `492ce04` (feat)
 
-**Plan metadata:** `b7f18fc` (docs: complete plan)
+**Plan metadata:** `fa97478` (docs: complete plan)
 
 ## Files Created/Modified
 

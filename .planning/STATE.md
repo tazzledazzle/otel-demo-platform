@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2025-02-24)
 
 **Core value:** End-to-end observable request flow from HTTP → Temporal workflow → agent, so one trace spans API, worker, and LLM and one pipeline step can be added live.
-**Current focus:** Milestone complete — all 3 phases done
+**Current focus:** v1.0 complete; planning next milestone
 
 ## Current Position
 
 Phase: 3 of 3 (Live-coding feature) ✓
 Plan: 1 of 1 complete
-Status: Phase 3 complete; milestone complete
-Last activity: 2026-02-25 — Phase 3 executed and verified
+Status: v1.0 milestone complete
+Last activity: 2026-02-25 — v1.0 completed and archived
 
 Progress: [██████████] 100%
 

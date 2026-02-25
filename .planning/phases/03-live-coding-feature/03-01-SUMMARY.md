@@ -58,7 +58,7 @@ Each task was committed atomically:
 1. **Task 1: Add new chain step in chain.py** - `e10c53e` (feat)
 2. **Task 2: Add test for new step / chain output** - `514570a` (test)
 
-**Plan metadata:** (final docs commit to follow)
+**Plan metadata:** `4e5c2cf` (docs: complete plan)
 
 ## Files Created/Modified
 

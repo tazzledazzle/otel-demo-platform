@@ -20,13 +20,14 @@ End-to-end observable request flow from HTTP → Temporal workflow → agent, so
 - ✓ Shared Temporal contracts (AgentWorkflow) between API and worker — current
 - ✓ OpenTelemetry in API, worker, and agent; OTLP export; W3C trace context propagation — current
 - ✓ Infra: temporalio/auto-setup, Grafana otel-lgtm, no app containers — current
+- ✓ Interview-ready docs (architecture, use cases, script, live feature), test data, integration steps — v1.0
+- ✓ One live-coding feature (summarize step in agent chain) demonstrable in-session — v1.0
 
 ### Active
 
-<!-- Current scope / next goals. -->
+<!-- Next milestone or future goals. -->
 
-- [ ] Interview-ready: docs (architecture, use cases, script, live feature), test data, integration steps
-- [ ] Optional: one live-coding feature (e.g. new pipeline step) demonstrable in-session
+- (None — v1.0 delivered interview-ready demo and live-coding feature)
 
 ### Out of Scope
 
@@ -37,9 +38,9 @@ End-to-end observable request flow from HTTP → Temporal workflow → agent, so
 
 ## Context
 
+- v1.0 shipped 2026-02-25: runnable demo docs, interview-ready docs (architecture, use cases, script, LIVE_FEATURE), and one implemented pipeline step (summarize in agent chain).
 - Built for a 1-hour interview flow: explain architecture, demo trace, implement one feature.
-- Codebase map and architecture docs live under `.planning/codebase/` and `otel-demo-platform/docs/`.
-- Agent uses local LLM via Ollama (no API keys).
+- Codebase map and architecture docs: `.planning/codebase/`, `otel-demo-platform/docs/`. Agent uses local LLM via Ollama (no API keys).
 
 ## Constraints
 
@@ -54,6 +55,8 @@ End-to-end observable request flow from HTTP → Temporal workflow → agent, so
 | Single Python agent called by Kotlin worker | Simpler than LangChain4j; reuses LangChain + Ollama. | ✓ Good |
 | Grafana otel-lgtm (not Datadog) | Self-hosted, OTLP-native, no vendor lock-in for demo. | ✓ Good |
 | No Dockerfiles for app services | Infra only in Docker; run API/worker/agent locally. | — Pending |
+| Summarize step as RunnableLambda (Phase 3) | Post-LLM chain step; executor normalizes list content. | ✓ Good |
+| Test mock LLM with RunnableLambda for LCEL | MagicMock not invoked as runnable; RunnableLambda works. | ✓ Good |
 
 ---
-*Last updated: 2025-02-24 after GSD new-project init (brownfield)*
+*Last updated: 2026-02-25 after v1.0 milestone*

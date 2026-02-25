@@ -57,7 +57,7 @@ Each task was committed atomically:
 1. **Task 1: Complete INTERVIEW_SCRIPT.md for ~1hr flow** — `dfbd0b6` (docs)
 2. **Task 2: Complete LIVE_FEATURE.md with which step and where it fits** — `2a95704` (docs)
 
-**Plan metadata:** (pending final commit)
+**Plan metadata:** `11e718f` (docs: complete interview script and live feature plan)
 
 ## Files Created/Modified
 
