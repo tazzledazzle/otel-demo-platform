@@ -1,0 +1,52 @@
+# Requirements: OpenTelemetry Demo Platform
+
+**Defined:** 2025-02-24
+**Core Value:** End-to-end observable request flow from HTTP → Temporal workflow → agent, so an interviewer or attendee can see one trace across API, worker, and LLM and add one pipeline step live.
+
+## v1 Requirements
+
+Requirements for initial release. Each maps to roadmap phases.
+
+### Demo & docs
+
+- [ ] **DOC-01**: Docs cover architecture, use cases, interview script, and one live-coding feature (e.g. new pipeline step)
+- [ ] **DOC-02**: Test data and integration steps allow running a full demo (start infra, API, worker, agent, send chat, view trace)
+
+### Optional feature (live-coding)
+
+- [ ] **FEAT-01**: One demonstrable pipeline step or small feature can be implemented live in-session (e.g. new activity or enrichment step)
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+- **OPS-01**: Dockerfiles for API, worker, agent (production-style deploy)
+- **OPS-02**: CI pipeline (build, test, optional deploy)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Datadog | Using Grafana otel-lgtm only |
+| LangChain4j / all-Kotlin agent | Agent is Python (LangChain) called by Kotlin worker |
+| Containerizing app services in v1 | Docker only for infra |
+| Production hardening in v1 | Focus is demo and interview |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DOC-01 | Phase 2 | Pending |
+| DOC-02 | Phase 1 | Pending |
+| FEAT-01 | Phase 3 | Pending |
+
+**Coverage:**
+- v1 requirements: 3 total
+- Mapped to phases: 3
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2025-02-24*
+*Last updated: 2025-02-24 after initial definition*

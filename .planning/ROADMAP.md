@@ -1,0 +1,68 @@
+# Roadmap: OpenTelemetry Demo Platform
+
+## Overview
+
+Deliver interview-ready demo and docs: first make the full demo runnable with test data and integration steps, then document architecture and script, then provide one implementable live-coding feature so a ~1hr session can explain, demo, and implement one pipeline step.
+
+## Phases
+
+**Phase Numbering:**
+- Integer phases (1, 2, 3): Planned milestone work
+- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+
+- [ ] **Phase 1: Runnable demo** - Test data and integration steps allow running full demo (infra → API/worker/agent → chat → trace)
+- [ ] **Phase 2: Interview-ready docs** - Docs cover architecture, use cases, interview script, and one live-coding feature
+- [ ] **Phase 3: Live-coding feature** - One pipeline step or small feature implementable live in-session
+
+## Phase Details
+
+### Phase 1: Runnable demo
+**Goal**: A full demo can be run from scratch so anyone can start infra, services, send chat, and view one trace.
+**Depends on**: Nothing (first phase)
+**Requirements**: DOC-02
+**Success Criteria** (what must be TRUE):
+  1. Reviewer can start all infra (Temporal, Grafana otel-lgtm, etc.) from documented integration steps.
+  2. Reviewer can start API, worker, and agent and confirm they are healthy (e.g. health endpoints).
+  3. Reviewer can send a chat request and receive a response (test data or example request documented).
+  4. Reviewer can view the end-to-end trace in Grafana (one trace spanning API, worker, agent/LLM).
+**Plans**: TBD
+
+Plans:
+- (To be created by plan-phase)
+
+### Phase 2: Interview-ready docs
+**Goal**: Documentation supports a ~1hr interview flow: explain architecture, demo trace, implement one feature.
+**Depends on**: Phase 1
+**Requirements**: DOC-01
+**Success Criteria** (what must be TRUE):
+  1. Architecture is documented (services, OTel, Temporal flow, request path).
+  2. Use cases and value of the demo are documented (why OTel, why Temporal, trace visibility).
+  3. An interview script exists (order of explain / demo / live-coding, rough timing for ~1hr).
+  4. One live-coding feature is described (e.g. which pipeline step to add and where it fits).
+**Plans**: TBD
+
+Plans:
+- (To be created by plan-phase)
+
+### Phase 3: Live-coding feature
+**Goal**: One pipeline step or small feature can be implemented live in-session and demonstrated.
+**Depends on**: Phase 2
+**Requirements**: FEAT-01
+**Success Criteria** (what must be TRUE):
+  1. The chosen pipeline step (or small feature) is clearly identified and scoped for in-session implementation.
+  2. A candidate can implement it following existing patterns (e.g. new activity or enrichment step).
+  3. The change is demonstrable (e.g. visible in trace or in observable behavior).
+**Plans**: TBD
+
+Plans:
+- (To be created by plan-phase)
+
+## Progress
+
+**Execution Order:** 1 → 2 → 3
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Runnable demo | 0/TBD | Not started | - |
+| 2. Interview-ready docs | 0/TBD | Not started | - |
+| 3. Live-coding feature | 0/TBD | Not started | - |
