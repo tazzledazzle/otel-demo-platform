@@ -14,7 +14,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Optional feature (live-coding)
 
-- [ ] **FEAT-01**: One demonstrable pipeline step or small feature can be implemented live in-session (e.g. new activity or enrichment step)
+- [x] **FEAT-01**: One demonstrable pipeline step or small feature can be implemented live in-session (e.g. new activity or enrichment step)
 
 ## v2 Requirements
 
@@ -40,7 +40,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | DOC-01 | Phase 2 | Complete |
 | DOC-02 | Phase 1 | Complete |
-| FEAT-01 | Phase 3 | Pending |
+| FEAT-01 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 3 total

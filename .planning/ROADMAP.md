@@ -12,7 +12,7 @@ Deliver interview-ready demo and docs: first make the full demo runnable with te
 
 - [x] **Phase 1: Runnable demo** - Test data and integration steps allow running full demo (infra → API/worker/agent → chat → trace) ✓ 2026-02-25
 - [x] **Phase 2: Interview-ready docs** - Docs cover architecture, use cases, interview script, and one live-coding feature ✓ 2026-02-25
-- [ ] **Phase 3: Live-coding feature** - One pipeline step or small feature implementable live in-session ✓ planned
+- [x] **Phase 3: Live-coding feature** - One pipeline step or small feature implementable live in-session ✓ 2026-02-25
 
 ## Phase Details
 
@@ -56,7 +56,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 03-01-PLAN.md — Add new chain step (prompt | llm | step) in chain.py + test
+- [x] 03-01-PLAN.md — Add new chain step (prompt | llm | step) in chain.py + test
 
 ## Progress
 
@@ -66,4 +66,4 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Runnable demo | 1/1 | Complete | 2026-02-25 |
 | 2. Interview-ready docs | 2/2 | Complete | 2026-02-25 |
-| 3. Live-coding feature | 0/TBD | Not started | - |
+| 3. Live-coding feature | 1/1 | Complete | 2026-02-25 |
