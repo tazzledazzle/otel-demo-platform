@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Demo & docs
 
-- [ ] **DOC-01**: Docs cover architecture, use cases, interview script, and one live-coding feature (e.g. new pipeline step)
+- [x] **DOC-01**: Docs cover architecture, use cases, interview script, and one live-coding feature (e.g. new pipeline step)
 - [x] **DOC-02**: Test data and integration steps allow running a full demo (start infra, API, worker, agent, send chat, view trace)
 
 ### Optional feature (live-coding)
@@ -38,7 +38,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DOC-01 | Phase 2 | Pending |
+| DOC-01 | Phase 2 | Complete |
 | DOC-02 | Phase 1 | Complete |
 | FEAT-01 | Phase 3 | Pending |
 
