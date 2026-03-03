@@ -10,7 +10,7 @@ Single reference for environment variables and defaults used by otel-demo-platfo
 
 | Variable                      | Default                                       | Description                                                                                                            |
 |-------------------------------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `API_PORT`                    | `8080` (or first free in 8080..8089 if unset) | HTTP port. **Preferred:** set `API_PORT=8080` and ensure no other process uses it so docs and one-command start match. |
+| `API_PORT`                    | `8080` when unset                             | HTTP port. When unset, API uses 8080 only; if 8080 is in use the process fails with a clear message. Set `API_PORT` to override. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317`                       | OTLP gRPC endpoint for traces.                                                                                         |
 
 ---
@@ -30,7 +30,7 @@ Single reference for environment variables and defaults used by otel-demo-platfo
 
 | Variable                      | Default                                              | Description                                                                                        |
 |-------------------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| `AGENT_PORT`                  | `8000` (or next available 8001..8009 if 8000 in use) | HTTP port. **Preferred:** set `AGENT_PORT=8000` and start Agent after API so 8080 is free for API. |
+| `AGENT_PORT`                  | `8000` when unset                             | HTTP port. When unset, Agent uses 8000 only; if 8000 is in use the process exits with a clear message. Set `AGENT_PORT` to override. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317`                              | OTLP gRPC endpoint for traces.                                                                     |
 | `OLLAMA_BASE_URL`             | `http://localhost:11434`                             | Ollama API URL.                                                                                    |
 | `OLLAMA_MODEL`                | `llama3.2`                                           | Model name (e.g. after `ollama pull llama3.2`).                                                    |

@@ -59,14 +59,20 @@ def create_app(agent=None) -> FastAPI:
 app = create_app()
 
 if __name__ == "__main__":
+    import sys
     import uvicorn
     agent_port_env = os.environ.get("AGENT_PORT")
-    port = int(agent_port_env or "8000")
+    if agent_port_env:
+        try:
+            port = int(agent_port_env)
+        except ValueError:
+            port = 8000
+    else:
+        port = 8000
     host = "0.0.0.0"
-    # When default port 8000 is in use (AGENT_PORT unset), try next ports to avoid bind failure.
-    if agent_port_env is None:
-        for _ in range(10):
-            if _port_available(host, port):
-                break
-            port += 1
+    if agent_port_env is None and not _port_available(host, 8000):
+        sys.stderr.write(
+            "Agent could not bind to port 8000. Set AGENT_PORT to a different port or stop the other process.\n"
+        )
+        sys.exit(1)
     uvicorn.run("agent.main:app", host=host, port=port, reload=False)
