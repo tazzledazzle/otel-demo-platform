@@ -22,6 +22,8 @@ Client → API → Temporal → Worker → Agent (LangChain)
 - **JDK 17+** and **Gradle** (for Kotlin services)
 - **Python 3.11+** (for Agent service)
 
+**Configuration:** All env vars and defaults are in [CONFIG.md](CONFIG.md).
+
 ## Quick Start
 
 1. **Start infrastructure**
@@ -49,10 +51,10 @@ Client → API → Temporal → Worker → Agent (LangChain)
 
 3. **Smoke check** — confirm each service is up before sending chat:
 
-   - **API:** `GET http://localhost:8080/health`
+   - **API:** `GET http://localhost:8080/health` (or the port printed when the API starts). The API returns `{"status":"ok","service":"otel-demo-api"}`; if you see only `{"status":"ok"}` you may be hitting the Agent.
    - **Agent:** `GET http://localhost:8000/health` (default `AGENT_PORT`)
 
-   Quick validation: `curl -s http://localhost:8080/health && curl -s http://localhost:8000/health`
+   Quick validation: `curl -s http://localhost:8080/health` should include `"service":"otel-demo-api"`.
 
 4. **Send a request**
 
@@ -60,14 +62,19 @@ Client → API → Temporal → Worker → Agent (LangChain)
    curl -X POST http://localhost:8080/chat -H "Content-Type: application/json" -d '{"message":"Hello"}'
    ```
 
-   For more examples (e.g. "What is 2 + 2?"), see `test-data/sample_requests.json`.
+   Use the **port the API prints at startup** (e.g. "API starting on http://0.0.0.0:8080"). If port 8080 is in use (e.g. by the Agent), the API will use 8081, 8082, etc. If you get `404 Not Found` or `{"detail":"Not Found"}`, you are likely hitting the wrong process—check that `GET /health` returns `"service":"otel-demo-api"`. For more examples, see `test-data/sample_requests.json`.
 
 5. **View traces in Grafana**
 
    - Open Grafana at http://localhost:3000 (login: admin / admin).
    - Go to **Explore** → select **Tempo**.
-   - Find the trace: use the **TraceQL** tab and filter by service name. String values must be quoted, e.g. `resource.service.name="api"` or `resource.service.name="otel-demo-api"`. Alternatively use **Search** or time range.
-   - You should see one trace with spans for **API**, **worker**, and **agent**.
+   - Find the trace: use the **TraceQL** tab with `resource.service.name="otel-demo-api"` (service names are `otel-demo-api`, `otel-demo-worker`, `otel-demo-agent` — not `"api"`). String values must be quoted. Alternatively use **Search** or time range.
+   - You should see one trace with spans for API, worker, and agent.
+
+**Troubleshooting**
+
+- **404 or `{"detail":"Not Found"}` on `/chat`** — You are likely hitting the Agent (or another app), not the API. The API returns `{"status":"ok","service":"otel-demo-api"}` for `GET /health`; the Agent returns only `{"status":"ok"}`. Use the port shown when the API starts ("API starting on http://0.0.0.0:PORT"). Start the API before the Agent so it can bind to 8080, or set `API_PORT=8080` and ensure nothing else uses that port.
+- **0 traces in Tempo** — (1) Send at least one request to the API `/chat` (correct port). (2) In TraceQL use `resource.service.name="otel-demo-api"`.
 
 ## Project Layout
 
