@@ -30,7 +30,10 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs and Makefile background process PIDs
 *.log
+.agent.pid
+.worker.pid
+.api.pid
 
 .planning/** */
