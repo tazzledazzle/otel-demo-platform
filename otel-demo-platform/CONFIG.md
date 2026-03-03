@@ -12,6 +12,7 @@ Single reference for environment variables and defaults used by otel-demo-platfo
 |-------------------------------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
 | `API_PORT`                    | `8080` when unset                             | HTTP port. When unset, API uses 8080 only; if 8080 is in use the process fails with a clear message. Set `API_PORT` to override. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317`                       | OTLP gRPC endpoint for traces.                                                                                         |
+| `OTEL_DISABLE_TRACING`       | unset                                         | When set to `true` or `1`, disables trace export (for interview: broken observability scenario). See [docs/BROKEN_OBSERVABILITY.md](docs/BROKEN_OBSERVABILITY.md). |
 
 ---
 
@@ -20,6 +21,7 @@ Single reference for environment variables and defaults used by otel-demo-platfo
 | Variable                      | Default                 | Description                                                     |
 |-------------------------------|-------------------------|-----------------------------------------------------------------|
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | OTLP gRPC endpoint for traces.                                  |
+| `OTEL_DISABLE_TRACING`       | unset                   | When `true` or `1`, disables trace export (broken observability scenario). See [docs/BROKEN_OBSERVABILITY.md](docs/BROKEN_OBSERVABILITY.md). |
 | `TEMPORAL_ADDRESS`            | `localhost:7233`        | Temporal gRPC address.                                          |
 | `TEMPORAL_TASK_QUEUE`         | `agent-task-queue`      | Task queue for workflows.                                       |
 | `AGENT_BASE_URL`              | `http://localhost:8000` | Base URL of the Agent service (`POST {AGENT_BASE_URL}/invoke`). |
@@ -32,8 +34,10 @@ Single reference for environment variables and defaults used by otel-demo-platfo
 |-------------------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | `AGENT_PORT`                  | `8000` when unset                             | HTTP port. When unset, Agent uses 8000 only; if 8000 is in use the process exits with a clear message. Set `AGENT_PORT` to override. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317`                              | OTLP gRPC endpoint for traces.                                                                     |
+| `OTEL_DISABLE_TRACING`       | unset                                                | When `true` or `1`, disables trace export (broken observability scenario). See [docs/BROKEN_OBSERVABILITY.md](docs/BROKEN_OBSERVABILITY.md). |
 | `OLLAMA_BASE_URL`             | `http://localhost:11434`                             | Ollama API URL.                                                                                    |
 | `OLLAMA_MODEL`                | `llama3.2`                                           | Model name (e.g. after `ollama pull llama3.2`).                                                    |
+| `AGENT_LLM_OFF`               | unset                                                | When set to `1` or `true`, the agent uses a stub executor (no Ollama). Use for CI or environments without GPU/Ollama. |
 
 ---
 
