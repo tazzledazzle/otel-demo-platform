@@ -6,13 +6,13 @@ The OTel Demo Platform is a small multi-service app for demonstrating OpenTeleme
 
 ## Components
 
-| Component | Language | Role |
-|-----------|----------|------|
-| **API** | Kotlin (Ktor) | Entrypoint; `POST /chat` starts a Temporal workflow and returns the result. |
-| **Worker** | Kotlin | Temporal worker; runs `AgentWorkflow` and `RunAgent` activity; activity calls the Agent via HTTP. |
-| **Agent** | Python (FastAPI) | LangChain + Ollama; `POST /invoke`; produces spans for model and tool calls. |
-| **Temporal** | Docker | Workflow engine (temporalio/auto-setup). |
-| **Grafana otel-lgtm** | Docker | OTel Collector + Tempo + Grafana (single image). |
+| Component             | Language         | Role                                                                                              |
+|-----------------------|------------------|---------------------------------------------------------------------------------------------------|
+| **API**               | Kotlin (Ktor)    | Entrypoint; `POST /chat` starts a Temporal workflow and returns the result.                       |
+| **Worker**            | Kotlin           | Temporal worker; runs `AgentWorkflow` and `RunAgent` activity; activity calls the Agent via HTTP. |
+| **Agent**             | Python (FastAPI) | LangChain + Ollama; `POST /invoke`; produces spans for model and tool calls.                      |
+| **Temporal**          | Docker           | Workflow engine (temporalio/auto-setup).                                                          |
+| **Grafana otel-lgtm** | Docker           | OTel Collector + Tempo + Grafana (single image).                                                  |
 
 ## Data flow
 

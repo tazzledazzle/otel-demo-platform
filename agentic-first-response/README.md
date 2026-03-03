@@ -24,4 +24,78 @@ Phases: Foundation → Knowledge Base & Ingestion → RAG & Retrieval → Triage
 
 ## Status
 
-Project initialized; implementation not started. See `.planning/STATE.md` and `.planning/ROADMAP.md` for progress.
+Foundation phase in progress: alert ingestion FastAPI service with stub triage agent.
+
+## Getting started
+
+- Python 3.10+ recommended.
+- Install dependencies from the project root:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Running the service
+
+From the project root:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+By default, the app listens on port 8000. You can override the port with the `PORT` environment variable.
+
+## Health check
+
+Once the server is running:
+
+```bash
+curl -s http://127.0.0.1:8000/health
+```
+
+You should see a JSON response containing `status: "ok"`.
+
+## Webhook endpoint
+
+The main entrypoint for alerts is:
+
+- **POST** `http://127.0.0.1:8000/webhook/alert`
+- **Content-Type:** `application/json`
+
+### Example PagerDuty-style payload
+
+```bash
+curl -s -X POST http://127.0.0.1:8000/webhook/alert \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_action": "trigger",
+    "dedup_key": "evt-1",
+    "payload": {
+      "summary": "High CPU on service foo",
+      "severity": "critical"
+    }
+  }'
+```
+
+### Example Datadog-style payload
+
+```bash
+curl -s -X POST http://127.0.0.1:8000/webhook/alert \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "dd-1",
+    "title": "High latency on bar",
+    "alert_type": "error",
+    "severity": "critical",
+    "tags": ["service:bar"]
+  }'
+```
+
+Both calls should return a JSON `StubTriageResponse` with fields:
+
+- `hypothesis`
+- `confidence`
+- `suggested_action`
+- `risk_level`
+
+Sending the same payload again with the same `external_id` (PagerDuty `dedup_key` or Datadog `id`) will return the same stub response without re-processing, satisfying the idempotency requirement.

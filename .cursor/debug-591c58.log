@@ -1,5 +1,0 @@
-{"sessionId":"591c58","location":"Main.kt:main","message":"main entered","data":{},"hypothesisId":"H0","timestamp":1772496059607}
-{"sessionId":"591c58","location":"Main.kt:resolvePort","message":"port check","data":{"port":8080,"available":false},"hypothesisId":"H1","timestamp":1772496059795}
-{"sessionId":"591c58","location":"Main.kt:resolvePort","message":"port check","data":{"port":8081,"available":true},"hypothesisId":"H1","timestamp":1772496059796}
-{"sessionId":"591c58","location":"Main.kt:main","message":"port resolved","data":{"port":8081,"API_PORT_env":"__unset__"},"hypothesisId":"H1","timestamp":1772496059796}
-{"sessionId":"591c58","location":"Main.kt:main","message":"about to start server","data":{"port":8081},"hypothesisId":"H2","timestamp":1772496059796}

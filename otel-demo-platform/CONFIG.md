@@ -10,7 +10,7 @@ Single reference for environment variables and defaults used by otel-demo-platfo
 
 | Variable                      | Default                                       | Description                                                                                                            |
 |-------------------------------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `API_PORT`                    | `8080` when unset                             | HTTP port. When unset, API uses 8080 only; if 8080 is in use the process fails with a clear message. Set `API_PORT` to override. |
+| `API_PORT`                    | `8080` when unset                             | HTTP port. When unset, API first tries 8080, then automatically discovers the next available port (logging the chosen port). Set `API_PORT` to force a specific port (process will fail if that port is in use). |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317`                       | OTLP gRPC endpoint for traces.                                                                                         |
 | `OTEL_DISABLE_TRACING`       | unset                                         | When set to `true` or `1`, disables trace export (for interview: broken observability scenario). See [docs/BROKEN_OBSERVABILITY.md](docs/BROKEN_OBSERVABILITY.md). |
 | `API_AUTH_ENABLED`           | unset                                         | When `true` or `1`, enables simple auth for `POST /chat` (401 on missing/invalid token).                              |

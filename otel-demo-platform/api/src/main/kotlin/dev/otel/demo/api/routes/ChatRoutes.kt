@@ -30,9 +30,7 @@ private fun logStructured(
 }
 
 private class SimpleChatRateLimiter(private val maxPerMinute: Long) {
-    @Volatile
     private var windowStartMillis: Long = System.currentTimeMillis()
-    @Volatile
     private var count: Long = 0
 
     @Synchronized
@@ -96,7 +94,7 @@ fun Routing.chatRoutes(
                 }
 
                 val client = try {
-                    TemporalClientFactory.create()
+                    clientFactory()
                 } catch (e: Exception) {
                     span.recordException(e)
                     span.setAttribute("temporal.status", "unavailable")
