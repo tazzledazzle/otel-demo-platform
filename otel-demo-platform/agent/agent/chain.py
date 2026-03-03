@@ -1,5 +1,8 @@
 """LangChain pipeline: tool-calling agent with Ollama and in-memory tools.
 
+Observability: each tool invocation adds a span event agent.tool.invoke with
+tool.name; the invoke span gets agent.tools_used (list of tool names) when present.
+
 Tools (all in-memory, no DB/network):
 - search(query): stub search returning a fixed string.
 - lookup(key): in-memory DEMO_KNOWLEDGE lookup (e.g. otel -> OpenTelemetry).
@@ -10,6 +13,7 @@ returns tool_calls we execute them and re-invoke until we get a final reply.
 See CONFIG.md for OLLAMA_* and AGENT_LLM_OFF.
 """
 import os
+from opentelemetry import trace
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
 from langchain_core.prompts import ChatPromptTemplate
@@ -55,12 +59,16 @@ def get_llm():
 
 def _agent_loop(llm, tools, user_input: str, max_steps: int = 10):
     """Run tool-calling loop: invoke LLM; on tool_calls, run tools and re-invoke until done."""
+    span = trace.get_current_span()
+    tools_used = []
     llm_with_tools = llm.bind_tools(tools)
     name_to_tool = {t.name: t for t in tools}
     messages = [HumanMessage(content=user_input)]
     for _ in range(max_steps):
         response = llm_with_tools.invoke(messages)
         if not getattr(response, "tool_calls", None):
+            if tools_used:
+                span.set_attribute("agent.tools_used", tools_used)
             content = response.content
             if isinstance(content, list):
                 content = "".join(str(block) for block in content) if content else ""
@@ -68,6 +76,8 @@ def _agent_loop(llm, tools, user_input: str, max_steps: int = 10):
         for tc in response.tool_calls:
             name = tc.get("name") or tc.get("name_")
             args = tc.get("args") or {}
+            span.add_event("agent.tool.invoke", attributes={"tool.name": name or "unknown"})
+            tools_used.append(name or "unknown")
             tool_fn = name_to_tool.get(name)
             if tool_fn:
                 result = tool_fn.invoke(args)
@@ -77,6 +87,8 @@ def _agent_loop(llm, tools, user_input: str, max_steps: int = 10):
             messages.append(
                 ToolMessage(content=str(result), tool_call_id=tc.get("id") or "")
             )
+    if tools_used:
+        span.set_attribute("agent.tools_used", tools_used)
     return "[max steps reached]"
 
 
