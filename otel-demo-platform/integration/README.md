@@ -37,9 +37,12 @@ Use port **8080**. More examples in `test-data/sample_requests.json` (each entry
 
 ## View one trace in Grafana
 
-- Open http://localhost:3000 (admin / admin).
-- Go to **Explore** → select **Tempo**.
-- Find the trace: in **TraceQL** use `resource.service.name="otel-demo-api"` (service names are `otel-demo-api`, `otel-demo-worker`, `otel-demo-agent`). If you get "unknown identifier", add quotes; if you get 0 series, use `otel-demo-api` not `api`.
-- You should see one trace with spans for API, worker, and agent.
+**Primary: TraceQL.** Open http://localhost:3000 (admin / admin) → **Explore** → **Tempo** → **TraceQL** tab. Run `{ resource.service.name="otel-demo-api" }` (quotes required). Pick a trace; you should see spans for API, worker, and agent. Full walkthrough (TraceQL examples, finding failures, latency): [docs/TRACE_WALKTHROUGH.md](../docs/TRACE_WALKTHROUGH.md).
 
-Expect a JSON response with `reply` from the curl above; the  same flow appears as one end-to-end trace in Tempo.
+**Alternative: use the UI** — In Explore → Tempo, use the **Search** tab, filter by Service name (e.g. otel-demo-api), run Search, and open a trace.
+
+Expect a JSON response with `reply` from the curl above; the same flow appears as one end-to-end trace in Tempo.
+
+## Inspect workflows in Temporal
+
+**Temporal walkthrough.** To inspect workflow runs, multi-step activity chains (preprocess → agent → postprocess), and retry behavior (e.g. the `fail:` message trigger), use the Temporal-focused guide: [docs/TEMPORAL_WALKTHROUGH.md](../docs/TEMPORAL_WALKTHROUGH.md). The `POST /chat` response includes `workflowId` and `taskQueue` so you can correlate with Temporal Web and Grafana.
