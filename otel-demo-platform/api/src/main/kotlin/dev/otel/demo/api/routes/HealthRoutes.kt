@@ -8,9 +8,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 
-fun Routing.healthRoutes(
-    temporalProbe: () -> Boolean = { TemporalHealth.isTemporalAvailable() }
-) {
+fun Routing.healthRoutes(temporalProbe: () -> Boolean = { TemporalHealth.isTemporalAvailable() }) {
     get("/health") {
         context.respond(HealthResponse(status = "ok", service = "otel-demo-api"))
     }
@@ -23,8 +21,8 @@ fun Routing.healthRoutes(
             code,
             ReadinessResponse(
                 status = status,
-                temporal = temporalStatus
-            )
+                temporal = temporalStatus,
+            ),
         )
     }
 }

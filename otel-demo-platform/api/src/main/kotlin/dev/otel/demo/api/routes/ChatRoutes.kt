@@ -5,14 +5,14 @@ import dev.otel.demo.api.TemporalClientFactory
 import dev.otel.demo.api.models.ChatRequest
 import dev.otel.demo.api.models.ChatResponse
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.post
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
-import io.ktor.server.request.receive
-import io.ktor.server.routing.Routing
-import io.ktor.server.routing.post
 
 private fun logStructured(
     service: String,
@@ -20,7 +20,7 @@ private fun logStructured(
     spanId: String,
     outcome: String,
     workflowId: String? = null,
-    taskQueue: String? = null
+    taskQueue: String? = null,
 ) {
     val extra = mutableListOf<String>()
     workflowId?.let { extra.add(""""workflow_id":"$it"""") }
@@ -32,6 +32,7 @@ private fun logStructured(
 private class SimpleChatRateLimiter(private val maxPerMinute: Long) {
     @Volatile
     private var windowStartMillis: Long = System.currentTimeMillis()
+
     @Volatile
     private var count: Long = 0
 
@@ -51,9 +52,7 @@ private class SimpleChatRateLimiter(private val maxPerMinute: Long) {
     }
 }
 
-fun Routing.chatRoutes(
-    clientFactory: () -> AgentWorkflowClient = { TemporalClientFactory.create() }
-) {
+fun Routing.chatRoutes(clientFactory: () -> AgentWorkflowClient = { TemporalClientFactory.create() }) {
     val tracer = GlobalOpenTelemetry.get().getTracer("otel-demo-api", "1.0")
     val authEnabled = (System.getenv("API_AUTH_ENABLED") ?: "false").trim().lowercase() in setOf("1", "true")
     val expectedToken = System.getenv("API_AUTH_TOKEN")?.trim().takeUnless { it.isNullOrEmpty() }
@@ -71,11 +70,12 @@ fun Routing.chatRoutes(
                 logStructured("otel-demo-api", sc.traceId, sc.spanId, "start")
                 if (authEnabled) {
                     val authHeader = ctx.request.headers["Authorization"]?.trim().orEmpty()
-                    val token = if (authHeader.startsWith("Bearer ")) {
-                        authHeader.removePrefix("Bearer ").trim()
-                    } else {
-                        authHeader
-                    }
+                    val token =
+                        if (authHeader.startsWith("Bearer ")) {
+                            authHeader.removePrefix("Bearer ").trim()
+                        } else {
+                            authHeader
+                        }
                     if (expectedToken.isNullOrEmpty() || token != expectedToken) {
                         span.recordException(IllegalStateException("unauthorized"))
                         logStructured("otel-demo-api", sc.traceId, sc.spanId, "unauthorized")
@@ -89,45 +89,48 @@ fun Routing.chatRoutes(
                     ctx.respond(HttpStatusCode.TooManyRequests, mapOf("error" to "rate_limit_exceeded"))
                     return@post
                 }
-                val body = runCatching { ctx.receive<ChatRequest>() }.getOrElse { e ->
-                    span.recordException(e)
-                    logStructured("otel-demo-api", sc.traceId, sc.spanId, "error")
-                    throw e
-                }
+                val body =
+                    runCatching { ctx.receive<ChatRequest>() }.getOrElse { e ->
+                        span.recordException(e)
+                        logStructured("otel-demo-api", sc.traceId, sc.spanId, "error")
+                        throw e
+                    }
 
-                val client = try {
-                    TemporalClientFactory.create()
-                } catch (e: Exception) {
-                    span.recordException(e)
-                    span.setAttribute("temporal.status", "unavailable")
-                    span.setStatus(StatusCode.ERROR, "temporal_unavailable")
-                    logStructured("otel-demo-api", sc.traceId, sc.spanId, "temporal_unavailable")
-                    ctx.respond(
-                        HttpStatusCode.ServiceUnavailable,
-                        mapOf(
-                            "error" to "temporal_unavailable",
-                            "message" to "Temporal service is unavailable; please try again later."
+                val client =
+                    try {
+                        TemporalClientFactory.create()
+                    } catch (e: Exception) {
+                        span.recordException(e)
+                        span.setAttribute("temporal.status", "unavailable")
+                        span.setStatus(StatusCode.ERROR, "temporal_unavailable")
+                        logStructured("otel-demo-api", sc.traceId, sc.spanId, "temporal_unavailable")
+                        ctx.respond(
+                            HttpStatusCode.ServiceUnavailable,
+                            mapOf(
+                                "error" to "temporal_unavailable",
+                                "message" to "Temporal service is unavailable; please try again later.",
+                            ),
                         )
-                    )
-                    return@post
-                }
+                        return@post
+                    }
 
-                val result = try {
-                    client.runAgentWorkflowDetailed(body.message)
-                } catch (e: Exception) {
-                    span.recordException(e)
-                    span.setAttribute("temporal.status", "unavailable")
-                    span.setStatus(StatusCode.ERROR, "temporal_unavailable")
-                    logStructured("otel-demo-api", sc.traceId, sc.spanId, "temporal_unavailable")
-                    ctx.respond(
-                        HttpStatusCode.ServiceUnavailable,
-                        mapOf(
-                            "error" to "temporal_unavailable",
-                            "message" to "Temporal service is unavailable; please try again later."
+                val result =
+                    try {
+                        client.runAgentWorkflowDetailed(body.message)
+                    } catch (e: Exception) {
+                        span.recordException(e)
+                        span.setAttribute("temporal.status", "unavailable")
+                        span.setStatus(StatusCode.ERROR, "temporal_unavailable")
+                        logStructured("otel-demo-api", sc.traceId, sc.spanId, "temporal_unavailable")
+                        ctx.respond(
+                            HttpStatusCode.ServiceUnavailable,
+                            mapOf(
+                                "error" to "temporal_unavailable",
+                                "message" to "Temporal service is unavailable; please try again later.",
+                            ),
                         )
-                    )
-                    return@post
-                }
+                        return@post
+                    }
 
                 span.setAttribute("workflow.id", result.workflowId)
                 span.setAttribute("task.queue", result.taskQueue)

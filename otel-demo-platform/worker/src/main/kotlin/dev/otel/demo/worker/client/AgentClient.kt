@@ -13,27 +13,33 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.context.Context
 import kotlinx.coroutines.runBlocking
 
-private val client = HttpClient(CIO) {
-    install(ContentNegotiation) {
-        jackson()
+private val client =
+    HttpClient(CIO) {
+        install(ContentNegotiation) {
+            jackson()
+        }
     }
-}
 
-fun agentInvoke(baseUrl: String, message: String): String = runBlocking {
-    val url = baseUrl.trimEnd('/') + "/invoke"
-    val body = mapOf("message" to message)
-    val carrier = mutableMapOf<String, String>()
-    GlobalOpenTelemetry.get().propagators.textMapPropagator.inject(
-        Context.current(),
-        carrier,
-        { c: MutableMap<String, String>?, k: String, v: String -> c?.set(k, v) }
-    )
-    val response: InvokeResponse = client.post(url) {
-        contentType(ContentType.Application.Json)
-        setBody(body)
-        for ((key, value) in carrier) headers.append(key, value)
-    }.body()
-    response.reply
-}
+fun agentInvoke(
+    baseUrl: String,
+    message: String,
+): String =
+    runBlocking {
+        val url = baseUrl.trimEnd('/') + "/invoke"
+        val body = mapOf("message" to message)
+        val carrier = mutableMapOf<String, String>()
+        GlobalOpenTelemetry.get().propagators.textMapPropagator.inject(
+            Context.current(),
+            carrier,
+            { c: MutableMap<String, String>?, k: String, v: String -> c?.set(k, v) },
+        )
+        val response: InvokeResponse =
+            client.post(url) {
+                contentType(ContentType.Application.Json)
+                setBody(body)
+                for ((key, value) in carrier) headers.append(key, value)
+            }.body()
+        response.reply
+    }
 
 private data class InvokeResponse(val reply: String)

@@ -2,7 +2,6 @@ package dev.otel.demo.api
 
 import dev.otel.demo.api.plugins.configureRouting
 import dev.otel.demo.api.plugins.configureSerialization
-import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import java.net.BindException

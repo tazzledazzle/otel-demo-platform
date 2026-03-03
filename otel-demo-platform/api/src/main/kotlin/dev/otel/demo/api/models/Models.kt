@@ -9,5 +9,5 @@ data class HealthResponse(val status: String, val service: String = "otel-demo-a
 data class ReadinessResponse(
     val status: String,
     val service: String = "otel-demo-api",
-    val temporal: String
+    val temporal: String,
 )

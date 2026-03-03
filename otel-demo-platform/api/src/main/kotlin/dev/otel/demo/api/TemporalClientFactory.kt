@@ -20,13 +20,15 @@ object TemporalClientFactory {
 
     fun create(): AgentWorkflowClient {
         val endpoint = System.getenv("TEMPORAL_ADDRESS") ?: "localhost:7233"
-        val service = WorkflowServiceStubs.newServiceStubs(
-            WorkflowServiceStubsOptions.newBuilder().setTarget(endpoint).build()
-        )
-        val client = WorkflowClient.newInstance(
-            service,
-            WorkflowClientOptions.newBuilder().build()
-        )
+        val service =
+            WorkflowServiceStubs.newServiceStubs(
+                WorkflowServiceStubsOptions.newBuilder().setTarget(endpoint).build(),
+            )
+        val client =
+            WorkflowClient.newInstance(
+                service,
+                WorkflowClientOptions.newBuilder().build(),
+            )
         return AgentWorkflowClient(client)
     }
 }
@@ -35,9 +37,10 @@ object TemporalHealth {
     fun isTemporalAvailable(): Boolean {
         return try {
             val endpoint = System.getenv("TEMPORAL_ADDRESS") ?: "localhost:7233"
-            val service = WorkflowServiceStubs.newServiceStubs(
-                WorkflowServiceStubsOptions.newBuilder().setTarget(endpoint).build()
-            )
+            val service =
+                WorkflowServiceStubs.newServiceStubs(
+                    WorkflowServiceStubsOptions.newBuilder().setTarget(endpoint).build(),
+                )
             service.shutdown()
             true
         } catch (e: Exception) {
@@ -54,15 +57,16 @@ class AgentWorkflowClient(private val client: WorkflowClient) {
     }
 
     fun runAgentWorkflowDetailed(message: String): AgentWorkflowRunResult {
-        val workflow = client.newWorkflowStub(
-            AgentWorkflow::class.java,
-            WorkflowOptions.newBuilder()
-                .setTaskQueue(taskQueue)
-                .setWorkflowId("agent-${System.currentTimeMillis()}")
-                .setWorkflowRunTimeout(WORKFLOW_RUN_TIMEOUT)
-                .setWorkflowTaskTimeout(WORKFLOW_TASK_TIMEOUT)
-                .build()
-        )
+        val workflow =
+            client.newWorkflowStub(
+                AgentWorkflow::class.java,
+                WorkflowOptions.newBuilder()
+                    .setTaskQueue(taskQueue)
+                    .setWorkflowId("agent-${System.currentTimeMillis()}")
+                    .setWorkflowRunTimeout(WORKFLOW_RUN_TIMEOUT)
+                    .setWorkflowTaskTimeout(WORKFLOW_TASK_TIMEOUT)
+                    .build(),
+            )
         val reply = workflow.run(message)
         val workflowId = WorkflowStub.fromTyped(workflow).execution.workflowId
         return AgentWorkflowRunResult(reply = reply, workflowId = workflowId, taskQueue = taskQueue)

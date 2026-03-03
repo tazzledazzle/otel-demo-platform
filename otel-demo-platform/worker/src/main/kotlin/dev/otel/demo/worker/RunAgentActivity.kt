@@ -5,12 +5,17 @@ import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.StatusCode
 import io.temporal.activity.Activity
 
-private fun logStructured(service: String, traceId: String, spanId: String, outcome: String) {
+private fun logStructured(
+    service: String,
+    traceId: String,
+    spanId: String,
+    outcome: String,
+) {
     System.err.println("""{"service":"$service","trace_id":"$traceId","span_id":"$spanId","outcome":"$outcome"}""")
 }
 
 class RunAgentActivity(
-    private val agentBaseUrl: String
+    private val agentBaseUrl: String,
 ) : RunAgentActivityInterface {
     override fun run(message: String): String {
         val span = Span.current()
