@@ -30,7 +30,7 @@ More examples (e.g. "What is 2 + 2?") are in `test-data/sample_requests.json`.
 
 - Open http://localhost:3000 (admin / admin).
 - Go to **Explore** → select **Tempo**.
-- Find the trace by service name (e.g. `api` or `otel-demo-api`) or time range.
+- Find the trace: in **TraceQL**, use quoted strings for service name, e.g. `resource.service.name="api"`. In the query builder, if you get "unknown identifier", click **Edit in TraceQL** and add quotes around the value.
 - You should see one trace with spans for **API**, **worker**, and **agent**.
 
 Expect a JSON response with `reply` from the curl above; the same flow appears as one end-to-end trace in Tempo.

@@ -66,7 +66,7 @@ Client → API → Temporal → Worker → Agent (LangChain)
 
    - Open Grafana at http://localhost:3000 (login: admin / admin).
    - Go to **Explore** → select **Tempo**.
-   - Find the trace: query by service name (e.g. `api` or `otel-demo-api`) or by time range.
+   - Find the trace: use the **TraceQL** tab and filter by service name. String values must be quoted, e.g. `resource.service.name="api"` or `resource.service.name="otel-demo-api"`. Alternatively use **Search** or time range.
    - You should see one trace with spans for **API**, **worker**, and **agent**.
 
 ## Project Layout

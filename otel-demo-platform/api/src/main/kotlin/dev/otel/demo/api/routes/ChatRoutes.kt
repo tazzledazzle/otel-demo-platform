@@ -10,9 +10,21 @@ import io.ktor.server.routing.post
 
 fun Routing.chatRoutes() {
     post("/chat") {
-        val body = context.receive<ChatRequest>()
+        val ctx = context
+        fun chatLog(msg: String) = System.err.println("[chat] $msg")
+        chatLog("POST /chat: request received")
+        val body = runCatching { ctx.receive<ChatRequest>() }.getOrElse { e ->
+            chatLog("POST /chat: failed to parse body - ${e.message}")
+            throw e
+        }
+        chatLog("POST /chat: body received message=${body.message}")
         val client = TemporalClientFactory.create()
-        val result = client.runAgentWorkflow(body.message)
-        context.respond(ChatResponse(result))
+        chatLog("POST /chat: calling agent workflow")
+        val result = runCatching { client.runAgentWorkflow(body.message) }.getOrElse { e ->
+            chatLog("POST /chat: workflow failed - ${e.message}")
+            throw e
+        }
+        chatLog("POST /chat: responding reply length=${result.length}")
+        ctx.respond(ChatResponse(result))
     }
 }
