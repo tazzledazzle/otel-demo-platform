@@ -23,7 +23,12 @@ class AgentWorkflowImpl : AgentWorkflow {
             .setScheduleToCloseTimeout(AGENT_ACTIVITY_TIMEOUT)
             .setRetryOptions(AGENT_ACTIVITY_RETRY_OPTIONS)
             .build()
-        val activity = Workflow.newActivityStub(RunAgentActivityInterface::class.java, options)
-        return activity.run(message)
+        val preprocessActivity = Workflow.newActivityStub(PreprocessActivityInterface::class.java, options)
+        val runAgentActivity = Workflow.newActivityStub(RunAgentActivityInterface::class.java, options)
+        val postprocessActivity = Workflow.newActivityStub(PostprocessActivityInterface::class.java, options)
+
+        val preprocessed = preprocessActivity.preprocess(message)
+        val rawReply = runAgentActivity.run(preprocessed)
+        return postprocessActivity.postprocess(rawReply)
     }
 }

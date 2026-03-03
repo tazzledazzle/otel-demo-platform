@@ -27,7 +27,11 @@ fun main() {
         WorkerOptions.newBuilder().build()
     )
     worker.registerWorkflowImplementationTypes(AgentWorkflowImpl::class.java)
-    worker.registerActivitiesImplementations(RunAgentActivity(agentBaseUrl))
+    worker.registerActivitiesImplementations(
+        PreprocessActivity(),
+        RunAgentActivity(agentBaseUrl),
+        PostprocessActivity()
+    )
     factory.start()
     println("Worker started; task queue=$taskQueue, agent=$agentBaseUrl")
     Thread.currentThread().join()
