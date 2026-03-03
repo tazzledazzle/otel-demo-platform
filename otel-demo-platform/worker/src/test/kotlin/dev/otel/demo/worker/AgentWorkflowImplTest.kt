@@ -16,7 +16,6 @@ private const val TEST_TASK_QUEUE = "test-agent-task-queue"
  * without a real Temporal cluster or Python agent.
  */
 class AgentWorkflowImplTest {
-
     private lateinit var testEnv: TestWorkflowEnvironment
 
     @BeforeEach
@@ -29,7 +28,7 @@ class AgentWorkflowImplTest {
             object : RunAgentActivityInterface {
                 override fun run(message: String): String = "mock-agent-reply"
             },
-            PostprocessActivity()
+            PostprocessActivity(),
         )
         testEnv.start()
     }
@@ -41,13 +40,14 @@ class AgentWorkflowImplTest {
 
     @Test
     fun `workflow runs preprocess then agent then postprocess and returns postprocessed reply`() {
-        val workflow = testEnv.workflowClient.newWorkflowStub(
-            AgentWorkflow::class.java,
-            WorkflowOptions.newBuilder()
-                .setTaskQueue(TEST_TASK_QUEUE)
-                .setWorkflowId("test-agent-1")
-                .build()
-        )
+        val workflow =
+            testEnv.workflowClient.newWorkflowStub(
+                AgentWorkflow::class.java,
+                WorkflowOptions.newBuilder()
+                    .setTaskQueue(TEST_TASK_QUEUE)
+                    .setWorkflowId("test-agent-1")
+                    .build(),
+            )
         val result = workflow.run("Hello")
         assertEquals("postprocessed:mock-agent-reply", result)
     }

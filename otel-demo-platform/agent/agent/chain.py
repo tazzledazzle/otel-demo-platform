@@ -16,8 +16,7 @@ import os
 from opentelemetry import trace
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+from langchain_core.messages import HumanMessage, ToolMessage
 
 
 # In-memory knowledge for lookup tool (no I/O).
