@@ -73,6 +73,7 @@ jobs:
         run: (cd agent && python -m agent.main > ../.agent.log 2>&1) &
         env:
           AGENT_PORT: "8000"
+          AGENT_LLM_OFF: "1"
 
       - name: Wait for Agent
         run: sleep 8
