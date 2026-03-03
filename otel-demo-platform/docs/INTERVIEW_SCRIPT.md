@@ -14,7 +14,7 @@ See **docs/ARCHITECTURE.md**, **docs/USE_CASES.md**, and **docs/LIVE_FEATURE.md*
 | **4. Run the stack** | 5 min | Run the stack (e.g. `docker compose up -d` for infra; start API, Worker, Agent per README or integration docs). Send one request (e.g. `curl -X POST http://localhost:8080/chat -d '{"message":"hi"}'`). |
 | **5. Grafana traces** | 10 min | Open Grafana (otel-lgtm) → Tempo (or Explore). Show a trace: API span → Worker span → Agent span → LangChain/agent spans. Show service graph if available. "This is W3C propagation end-to-end." |
 | **6. Temporal (optional)** | 5 min | Open Temporal Web UI; show one workflow run and its activities. "Same concepts we use in production: workflow, activities, retries." |
-| **7. Live: new pipeline step** | 20 min | **Follow step-by-step in docs/LIVE_FEATURE.md.** Add one new pipeline step in the **Python agent** (e.g. new tool or new chain step). ~20 min; keep it small so it fits. |
+| **7. Live: new pipeline step** | 20 min | **Follow step-by-step in docs/LIVE_FEATURE.md.** Add one new pipeline step in the **Python agent** (e.g. add a new tool in `chain.py` and `TOOLS`, or change the agent loop). The agent is a tool-calling agent (search, lookup, echo_repeat). For environments without Ollama, run the agent with `AGENT_LLM_OFF=1`. ~20 min; keep it small so it fits. |
 | **8. Buffer / Q&A** | 2 min | Wrap up or answer questions. |
 
 **Deliverable:** This file in the repo for reference during the interview.
