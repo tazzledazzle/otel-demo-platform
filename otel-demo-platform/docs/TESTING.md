@@ -40,11 +40,11 @@ Then:
 curl -X POST http://localhost:8080/chat -H "Content-Type: application/json" -d '{"message":"Hello"}'
 ```
 
-Expect a JSON reply. Traces appear in Grafana (http://localhost:3000, Explore → Tempo).
+Expect 200 and JSON with `"reply"`. Port 8080 is the API default (see [CONFIG.md](../CONFIG.md)). Traces appear in Grafana (http://localhost:3000, Explore → Tempo).
 
 ## Test data
 
-- **Sample requests**: `test-data/sample_requests.json` — example `POST /chat` bodies.
+- **Sample requests**: `test-data/sample_requests.json` — each entry has a `body` with `"message"` only (matches API `ChatRequest`).
 - **Fixtures**: `agent/tests/fixtures/` — mock LLM responses (used via mocks in tests).
 
 ## Prerequisites for local/demo

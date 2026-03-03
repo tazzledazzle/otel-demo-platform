@@ -20,13 +20,20 @@ Confirm services before sending chat:
 
 Example: `curl -s http://localhost:8080/health && curl -s http://localhost:8000/health`
 
+## Golden-path chat flow
+
+1. Start infra: `docker compose up -d` (or `make infra`).
+2. Start Agent, Worker, API in order (or `make run` for one-command start).
+3. **Health:** `curl -s http://localhost:8080/health` and `curl -s http://localhost:8000/health` — expect `{"status":"ok"}` (API also returns `"service":"otel-demo-api"`).
+4. **Chat:** `curl -X POST http://localhost:8080/chat -H "Content-Type: application/json" -d '{"message":"Hello"}'` — expect 200 and JSON with `"reply"`.
+
 ## Send a request
 
 ```bash
 curl -X POST http://localhost:8080/chat -H "Content-Type: application/json" -d '{"message":"Hello"}'
 ```
 
-Use port **8080** (not 8880). More examples in `test-data/sample_requests.json`.
+Use port **8080**. More examples in `test-data/sample_requests.json` (each entry has a `body` with `"message"` only).
 
 ## View one trace in Grafana
 
