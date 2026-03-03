@@ -23,7 +23,8 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/python -m pytest tests/ -v
 ```
 
-- **Agent**: `agent/tests/` — search tool, agent executor with mock LLM, FastAPI health and `/invoke` with mock agent.
+- **Agent**: `agent/tests/` — tools (search, lookup, echo_repeat), agent executor with mock LLM, FastAPI health and `/invoke` with mock agent. All tests pass without Ollama (mocks and optional `AGENT_LLM_OFF` stub).
+- **Run without Ollama:** To run the agent (or e2e) without Ollama, set `AGENT_LLM_OFF=1`. The agent returns a stub reply. See [CONFIG.md](../CONFIG.md) and [agent/README.md](../agent/README.md).
 
 ## Integration test (E2E)
 

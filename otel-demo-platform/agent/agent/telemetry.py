@@ -13,11 +13,13 @@ from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapProp
 def setup_telemetry(service_name: str, otlp_endpoint: str) -> None:
     if not otlp_endpoint:
         return
-    endpoint = otlp_endpoint.replace("http://", "").replace("https://", "")
+    disable = os.environ.get("OTEL_DISABLE_TRACING", "").lower() in ("true", "1")
     resource = Resource.create({"service.name": service_name})
     provider = TracerProvider(resource=resource)
-    exporter = OTLPSpanExporter(endpoint=endpoint, insecure=True)
-    provider.add_span_processor(BatchSpanProcessor(exporter))
+    if not disable:
+        endpoint = otlp_endpoint.replace("http://", "").replace("https://", "")
+        exporter = OTLPSpanExporter(endpoint=endpoint, insecure=True)
+        provider.add_span_processor(BatchSpanProcessor(exporter))
     trace.set_tracer_provider(provider)
     set_global_textmap(TraceContextTextMapPropagator())
 

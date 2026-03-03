@@ -11,6 +11,16 @@ Preferred ports: **API 8080**, **Agent 8000**. If a port is in use, the process 
 3. **Worker:** `cd worker && ./gradlew run`
 4. **API:** `cd api && ./gradlew run`
 
+### Modes: demo vs hardened
+
+- **Demo mode (default):** `docker compose up -d`
+  - Uses clearly-marked demo credentials for Postgres and Grafana (see [CONFIG.md](../CONFIG.md)).
+  - Suitable for local exploration, workshops, and E2E tests on a laptop.
+- **Hardened mode (illustrative):** `docker compose -f docker-compose.yml -f docker-compose.hardened.yml up -d`
+  - Requires you to set non-demo credentials via env vars (Postgres, Grafana).
+  - Removes direct host exposure for Postgres and enforces non-default Grafana admin credentials.
+  - See [CONFIG.md](../CONFIG.md) and [docs/PRODUCTION_CHECKLIST.md](../docs/PRODUCTION_CHECKLIST.md) for the exact variables.
+
 ## Smoke check
 
 Confirm services before sending chat:

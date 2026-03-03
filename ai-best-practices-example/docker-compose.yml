@@ -1,0 +1,32 @@
+# Local AI "cluster": Ollama + optional app service.
+# Quick start: docker compose up -d ollama && ollama pull llama3.2:3b
+# Then from host: uv run python examples/chat_cli.py (use LLM_BASE_URL=http://localhost:11434/v1)
+
+services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Optional: run the FastAPI app inside Docker (uses http://ollama:11434)
+  # app:
+  #   build: .
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     LLM_BASE_URL: http://ollama:11434/v1
+  #     OPENAI_API_KEY: placeholder
+  #     LLM_MODEL: llama3.2:3b
+  #   depends_on:
+  #     ollama:
+  #       condition: service_healthy
+
+volumes:
+  ollama_data: {}

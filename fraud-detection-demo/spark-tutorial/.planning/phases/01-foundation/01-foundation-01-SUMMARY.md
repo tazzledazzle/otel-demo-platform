@@ -92,6 +92,13 @@ None - no external service configuration required.
 
 All created files present; commits 24fa7d2 and 1f2333a verified in repo.
 
+## Verification (2026-02-25)
+
+- `cd spark-tutorial && .venv/bin/python src/first_job.py` → exit 0.
+- Stdout shows DataFrame output (columns: name, age, score; 4 rows after filter).
+- Sandbox blocks Spark JVM (/bin/ps, network); run with full permissions or outside sandbox for automated verification; documented flow (pip install, python src/first_job.py) unchanged for learners.
+
 ---
 *Phase: 01-foundation*
 *Completed: 2026-02-26*
+*Verification re-run: 2026-02-25*

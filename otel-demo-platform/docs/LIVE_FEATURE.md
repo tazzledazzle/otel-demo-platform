@@ -63,8 +63,8 @@ Add one new step in the Python agent that appears as new span(s) or tool usage i
 ## Suggested order for the 20 min
 
 1. Add the new tool or change the chain in `chain.py` (5 min).
-2. Add a short pytest (3 min).
-3. Run tests (1 min).
+2. Add a short pytest in `agent/tests/test_chain.py` (3 min).
+3. Run tests: `cd agent && uv run pytest tests/ -v` (1 min).
 4. Start the stack and send one request (3 min).
 5. Open Grafana and show the new span / tool usage (5 min).
 6. Buffer for questions (3 min).

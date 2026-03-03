@@ -2,6 +2,7 @@ package dev.otel.demo.worker
 
 import dev.otel.demo.worker.client.agentInvoke
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.StatusCode
 import io.temporal.activity.Activity
 
 private fun logStructured(service: String, traceId: String, spanId: String, outcome: String) {
@@ -41,6 +42,8 @@ class RunAgentActivity(
         } catch (e: Exception) {
             span.addEvent("agent.invocation.end")
             span.recordException(e)
+            span.setAttribute("error.type", "agent_failure")
+            span.setStatus(StatusCode.ERROR, "agent invocation failed")
             logStructured("otel-demo-worker", sc.traceId, sc.spanId, "error")
             throw e
         }

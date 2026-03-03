@@ -31,6 +31,21 @@ object TemporalClientFactory {
     }
 }
 
+object TemporalHealth {
+    fun isTemporalAvailable(): Boolean {
+        return try {
+            val endpoint = System.getenv("TEMPORAL_ADDRESS") ?: "localhost:7233"
+            val service = WorkflowServiceStubs.newServiceStubs(
+                WorkflowServiceStubsOptions.newBuilder().setTarget(endpoint).build()
+            )
+            service.shutdown()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+}
+
 class AgentWorkflowClient(private val client: WorkflowClient) {
     private val taskQueue = System.getenv("TEMPORAL_TASK_QUEUE") ?: "agent-task-queue"
 

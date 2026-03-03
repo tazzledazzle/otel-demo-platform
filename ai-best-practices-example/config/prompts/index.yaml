@@ -1,0 +1,8 @@
+# Prompt registry: name -> template path or config
+chat_system:
+  template: chat_system.jinja2
+  description: System prompt for general chat
+
+rag_qa:
+  template: rag_qa.jinja2
+  description: RAG question-answering with context

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 
 class HealthRoutesTest {
     @Test
-    fun `GET health returns OK`() = testApplication {
+    fun `GET health returns JSON with status and service`() = testApplication {
         application {
             install(ContentNegotiation) {
                 jackson()
@@ -22,6 +22,44 @@ class HealthRoutesTest {
             }
         }
         val response = client.get("/health")
-        assertEquals("OK", response.bodyAsText())
+        assertEquals(200, response.status.value)
+        val json = response.bodyAsText()
+        assert(json.contains("ok") && json.contains("otel-demo-api")) { "Expected status and service in body: $json" }
+    }
+
+    @Test
+    fun `GET ready returns 200 when Temporal probe succeeds`() = testApplication {
+        application {
+            install(ContentNegotiation) {
+                jackson()
+            }
+            routing {
+                healthRoutes(temporalProbe = { true })
+            }
+        }
+        val response = client.get("/ready")
+        assertEquals(200, response.status.value)
+        val json = response.bodyAsText()
+        assert(json.contains("ready") && json.contains("available")) {
+            "Expected ready status and temporal available in body: $json"
+        }
+    }
+
+    @Test
+    fun `GET ready returns 503 when Temporal probe fails`() = testApplication {
+        application {
+            install(ContentNegotiation) {
+                jackson()
+            }
+            routing {
+                healthRoutes(temporalProbe = { false })
+            }
+        }
+        val response = client.get("/ready")
+        assertEquals(503, response.status.value)
+        val json = response.bodyAsText()
+        assert(json.contains("degraded") && json.contains("unavailable")) {
+            "Expected degraded status and temporal unavailable in body: $json"
+        }
     }
 }

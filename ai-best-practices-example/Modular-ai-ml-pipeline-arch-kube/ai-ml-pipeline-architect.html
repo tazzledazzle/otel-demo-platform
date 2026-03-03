@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI/ML Pipeline Architect — 100 Systems Deconstructed</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #00d4aa;
+    --accent2: #7c6aff;
+    --accent3: #ff6b6b;
+    --accent4: #ffd93d;
+    --accent5: #4ecdc4;
+    --glow: rgba(0, 212, 170, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .grain {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999;
+  }
+
+  header {
+    padding: 40px 60px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,212,170,0.03) 0%, transparent 100%);
+  }
+
+  header h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  header p {
+    color: var(--text-dim);
+    font-size: 14px;
+    max-width: 700px;
+  }
+
+  .nav {
+    display: flex;
+    gap: 0;
+    padding: 0 60px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .nav button {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 14px 24px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .nav button:hover { color: var(--text); }
+  .nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(0,212,170,0.05);
+  }
+
+  .content { padding: 30px 60px 60px; }
+
+  .tab { display: none; }
+  .tab.active { display: block; }
+
+  /* ===== TAB 1: MIND MAP ===== */
+  .systems-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .category-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 0 8px;
+    border-bottom: 1px solid var(--border);
+    margin-top: 10px;
+  }
+
+  .category-header .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .category-header h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .category-header span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+
+  .system-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .system-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    border-radius: 8px 0 0 8px;
+  }
+
+  .system-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  .system-card .name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .system-card .type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .system-card .components {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .component-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(0,212,170,0.1);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+  }
+
+  .component-tag.data { background: rgba(255,217,61,0.1); color: var(--accent4); }
+  .component-tag.model { background: rgba(124,106,255,0.1); color: var(--accent2); }
+  .component-tag.serve { background: rgba(78,205,196,0.1); color: var(--accent5); }
+  .component-tag.monitor { background: rgba(255,107,107,0.1); color: var(--accent3); }
+
+  /* ===== TAB 2: PATTERN LIBRARY ===== */
+  .pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .pattern-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    transition: all 0.3s;
+  }
+
+  .pattern-card:hover {
+    border-color: var(--accent2);
+    box-shadow: 0 0 30px rgba(124,106,255,0.1);
+  }
+
+  .pattern-card .layer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .pattern-card h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .pattern-card .desc {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .pattern-card .k8s-ref {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .pattern-card .used-by {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .pattern-card .used-by strong {
+    color: var(--accent5);
+  }
+
+  /* ===== TAB 3: K8S ARCHITECTURE ===== */
+  .arch-section {
+    margin-bottom: 40px;
+  }
+
+  .arch-section h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .arch-section .subtitle {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .pod-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  .pod-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    position: relative;
+  }
+
+  .pod-card .pod-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .pod-card h5 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .pod-card .pod-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .pod-card .pod-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pod-card .pod-meta span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  /* ===== TAB 4: CODE ===== */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-header .filename {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .code-header .lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .code-body {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  .code-body .kw { color: var(--accent2); }
+  .code-body .str { color: var(--accent); }
+  .code-body .cmt { color: #555570; font-style: italic; }
+  .code-body .fn { color: var(--accent4); }
+  .code-body .type { color: var(--accent5); }
+  .code-body .num { color: var(--accent3); }
+
+  /* ===== STATS BAR ===== */
+  .stats-bar {
+    display: flex;
+    gap: 30px;
+    padding: 20px 0;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat .val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ===== SEARCH ===== */
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    max-width: 500px;
+  }
+
+  .search-box input {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+  }
+
+  .search-box input::placeholder { color: var(--text-dim); }
+
+  .filter-pills {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filter-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-pill:hover, .filter-pill.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,170,0.08);
+  }
+
+  /* ===== PIPELINE BUILDER ===== */
+  .pipeline-canvas {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 30px;
+    min-height: 200px;
+    margin-bottom: 20px;
+  }
+
+  .pipeline-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 20px 0;
+  }
+
+  .pipeline-node {
+    flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-width: 160px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .pipeline-node:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--glow);
+  }
+
+  .pipeline-node .node-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .pipeline-node .node-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .pipeline-node .node-type {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .pipeline-arrow {
+    flex-shrink: 0;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    position: relative;
+  }
+
+  .pipeline-arrow::after {
+    content: '▶';
+    position: absolute;
+    right: -6px;
+    top: -8px;
+    font-size: 10px;
+    color: var(--accent2);
+  }
+
+  @media (max-width: 768px) {
+    header, .nav, .content { padding-left: 20px; padding-right: 20px; }
+    .systems-grid { grid-template-columns: 1fr; }
+    .pattern-grid { grid-template-columns: 1fr; }
+    .pod-grid { grid-template-columns: 1fr; }
+    header h2 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <h1>AI/ML Pipeline Architect</h1>
+  <h2>100 Systems Deconstructed → 28 Design Patterns → Kubernetes Pods</h2>
+  <p>Comprehensive analysis of 100 production AI/ML systems, extracting common architectural patterns and mapping them to composable Kubernetes-native pipeline components.</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showTab('mindmap')">Mind Map (100 Systems)</button>
+  <button onclick="showTab('patterns')">Design Patterns (28)</button>
+  <button onclick="showTab('pods')">K8s Pod Library</button>
+  <button onclick="showTab('pipeline')">Pipeline Builder</button>
+  <button onclick="showTab('code')">Deployment Code</button>
+</nav>
+
+<div class="content">
+
+<!-- ============================================================ -->
+<!-- TAB 1: MIND MAP OF 100 AI/ML SYSTEMS                        -->
+<!-- ============================================================ -->
+<div id="tab-mindmap" class="tab active">
+  <div class="stats-bar">
+    <div class="stat"><span class="val">100</span><span class="label">Systems Analyzed</span></div>
+    <div class="stat"><span class="val">10</span><span class="label">Categories</span></div>
+    <div class="stat"><span class="val">28</span><span class="label">Patterns Extracted</span></div>
+    <div class="stat"><span class="val">42</span><span class="label">K8s Pod Types</span></div>
+  </div>
+
+  <div class="search-box">
+    <span style="color:var(--text-dim)">⌕</span>
+    <input type="text" id="search-systems" placeholder="Search systems, components, patterns..." oninput="filterSystems()">
+  </div>
+
+  <div class="filter-pills">
+    <button class="filter-pill active" onclick="filterCategory('all', this)">All</button>
+    <button class="filter-pill" onclick="filterCategory('llm', this)">LLM/Foundation</button>
+    <button class="filter-pill" onclick="filterCategory('cv', this)">Computer Vision</button>
+    <button class="filter-pill" onclick="filterCategory('nlp', this)">NLP/Search</button>
+    <button class="filter-pill" onclick="filterCategory('rec', this)">Recommendation</button>
+    <button class="filter-pill" onclick="filterCategory('agent', this)">Agents/Agentic</button>
+    <button class="filter-pill" onclick="filterCategory('mlops', this)">MLOps/Platform</button>
+    <button class="filter-pill" onclick="filterCategory('speech', this)">Speech/Audio</button>
+    <button class="filter-pill" onclick="filterCategory('gen', this)">Generative</button>
+    <button class="filter-pill" onclick="filterCategory('auto', this)">AutoML/AutoDL</button>
+    <button class="filter-pill" onclick="filterCategory('edge', this)">Edge/Embedded</button>
+  </div>
+
+  <div class="systems-grid" id="systems-grid"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 2: DESIGN PATTERN LIBRARY                                -->
+<!-- ============================================================ -->
+<div id="tab-patterns" class="tab">
+  <div class="stats-bar">
+    <div class="stat"><span class="val">28</span><span class="label">Design Patterns</span></div>
+    <div class="stat"><span class="val">7</span><span class="label">Architecture Layers</span></div>
+    <div class="stat"><span class="val">100%</span><span class="label">K8s Mapped</span></div>
+  </div>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">Each pattern was extracted by identifying recurring architectural components across all 100 systems. Every pattern maps to a deployable Kubernetes pod template.</p>
+  <div class="pattern-grid" id="pattern-grid"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 3: K8S POD LIBRARY                                       -->
+<!-- ============================================================ -->
+<div id="tab-pods" class="tab">
+  <div class="stats-bar">
+    <div class="stat"><span class="val">42</span><span class="label">Pod Definitions</span></div>
+    <div class="stat"><span class="val">7</span><span class="label">Namespaces</span></div>
+    <div class="stat"><span class="val">∞</span><span class="label">Pipeline Combos</span></div>
+  </div>
+  <div id="pods-content"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 4: PIPELINE BUILDER                                      -->
+<!-- ============================================================ -->
+<div id="tab-pipeline" class="tab">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;margin-bottom:6px;">Reference Pipelines</h3>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:24px;">Pre-composed pipelines for common AI/ML workloads. Each node is a deployable pod from the library.</p>
+  <div id="pipelines-content"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 5: DEPLOYMENT CODE                                       -->
+<!-- ============================================================ -->
+<div id="tab-code" class="tab">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:20px;margin-bottom:6px;">Deployment Manifests &amp; Code</h3>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:24px;">Production-ready Kubernetes manifests, Helm charts, and operator code for deploying the full pattern library.</p>
+  <div id="code-content"></div>
+</div>
+
+</div>
+
+<script>
+// ============================================
+// DATA: 100 AI/ML SYSTEMS
+// ============================================
+const systems = [
+  // === LLM / FOUNDATION MODELS ===
+  {name:"GPT-4/4o",cat:"llm",type:"Autoregressive LLM",components:["transformer","tokenizer","RLHF","KV-cache","MoE-router","embedding-store","prompt-cache"]},
+  {name:"Claude 3.5/4",cat:"llm",type:"Constitutional AI LLM",components:["transformer","tokenizer","RLAIF","safety-filter","tool-use","context-window","embedding-store"]},
+  {name:"Gemini 2.0",cat:"llm",type:"Multimodal LLM",components:["transformer","vision-encoder","audio-encoder","tokenizer","MoE-router","embedding-store","function-calling"]},
+  {name:"Llama 3.1/4",cat:"llm",type:"Open-weight LLM",components:["transformer","tokenizer","RLHF","GQA","RoPE","embedding-store","quantizer"]},
+  {name:"Mistral/Mixtral",cat:"llm",type:"MoE LLM",components:["transformer","MoE-router","tokenizer","sliding-window","embedding-store","quantizer"]},
+  {name:"DeepSeek-V3",cat:"llm",type:"MoE Foundation",components:["transformer","MoE-router","tokenizer","FP8-training","embedding-store","multi-head-latent-attn"]},
+  {name:"Command R+",cat:"llm",type:"RAG-optimized LLM",components:["transformer","tokenizer","RAG-engine","citation-gen","grounding-layer","tool-use"]},
+  {name:"Phi-3/4",cat:"llm",type:"Small Language Model",components:["transformer","tokenizer","distillation","quantizer","embedding-store","mobile-runtime"]},
+  {name:"Qwen 2.5",cat:"llm",type:"Multilingual LLM",components:["transformer","tokenizer","code-interpreter","math-engine","embedding-store","MoE-router"]},
+  {name:"Grok-2",cat:"llm",type:"Conversational LLM",components:["transformer","tokenizer","real-time-data","RLHF","embedding-store","function-calling"]},
+
+  // === COMPUTER VISION ===
+  {name:"YOLO v9/v10",cat:"cv",type:"Object Detection",components:["CNN-backbone","feature-pyramid","anchor-head","NMS","data-augmentor","model-exporter"]},
+  {name:"SAM 2",cat:"cv",type:"Segmentation",components:["vision-transformer","prompt-encoder","mask-decoder","memory-bank","video-tracker","embedding-store"]},
+  {name:"DINOv2",cat:"cv",type:"Self-supervised Vision",components:["vision-transformer","self-distillation","feature-extractor","data-augmentor","embedding-store"]},
+  {name:"Detectron2",cat:"cv",type:"Detection Framework",components:["CNN-backbone","RPN","ROI-head","feature-pyramid","data-loader","config-system"]},
+  {name:"OpenCV DNN",cat:"cv",type:"Vision Processing",components:["image-preprocessor","model-loader","inference-engine","post-processor","video-pipeline"]},
+  {name:"MediaPipe",cat:"cv",type:"ML Pipeline Framework",components:["graph-executor","calculator-nodes","model-loader","stream-processor","mobile-runtime"]},
+  {name:"Florence-2",cat:"cv",type:"Vision-Language",components:["vision-encoder","text-decoder","task-router","prompt-parser","embedding-store","region-proposer"]},
+  {name:"Grounding DINO",cat:"cv",type:"Open-set Detection",components:["vision-transformer","text-encoder","cross-modal-fusion","box-decoder","NMS"]},
+  {name:"Depth Anything V2",cat:"cv",type:"Monocular Depth",components:["vision-transformer","DPT-head","data-augmentor","model-exporter","feature-extractor"]},
+  {name:"CLIP",cat:"cv",type:"Vision-Language Contrastive",components:["vision-encoder","text-encoder","contrastive-loss","embedding-store","zero-shot-classifier"]},
+
+  // === NLP / SEARCH ===
+  {name:"Elasticsearch + ML",cat:"nlp",type:"Search Engine",components:["inverted-index","vector-store","BM25-scorer","ML-reranker","query-parser","aggregator"]},
+  {name:"ColBERT v2",cat:"nlp",type:"Neural Retriever",components:["BERT-encoder","late-interaction","index-builder","ANN-search","embedding-store","query-encoder"]},
+  {name:"Sentence-BERT",cat:"nlp",type:"Sentence Embeddings",components:["BERT-encoder","pooling-layer","embedding-store","similarity-scorer","fine-tuner"]},
+  {name:"spaCy Pipeline",cat:"nlp",type:"NLP Toolkit",components:["tokenizer","POS-tagger","NER","dependency-parser","text-classifier","pipeline-builder"]},
+  {name:"Haystack",cat:"nlp",type:"RAG Framework",components:["retriever","reader","document-store","prompt-builder","pipeline-builder","evaluator"]},
+  {name:"LlamaIndex",cat:"nlp",type:"Data Framework",components:["data-loader","index-builder","query-engine","retriever","response-synthesizer","embedding-store"]},
+  {name:"Pinecone",cat:"nlp",type:"Vector Database",components:["vector-store","ANN-search","metadata-filter","namespace-manager","embedding-store","replication"]},
+  {name:"Weaviate",cat:"nlp",type:"Vector Search Engine",components:["vector-store","hybrid-search","schema-manager","module-system","GraphQL-API","replication"]},
+  {name:"Cohere Rerank",cat:"nlp",type:"Neural Reranker",components:["cross-encoder","scorer","batch-processor","API-gateway","model-loader","cache"]},
+  {name:"BGE Embeddings",cat:"nlp",type:"Embedding Model",components:["BERT-encoder","embedding-store","fine-tuner","quantizer","batch-processor","model-exporter"]},
+
+  // === RECOMMENDATION SYSTEMS ===
+  {name:"YouTube DNN",cat:"rec",type:"Video Recommendation",components:["candidate-generator","ranker","feature-store","embedding-table","serving-layer","A/B-test"]},
+  {name:"Spotify Discover",cat:"rec",type:"Music Discovery",components:["collaborative-filter","content-model","feature-store","candidate-generator","ranker","bandit"]},
+  {name:"Netflix Recommendation",cat:"rec",type:"Content Recommendation",components:["matrix-factorizer","feature-store","candidate-generator","ranker","A/B-test","session-context"]},
+  {name:"Pinterest Homefeed",cat:"rec",type:"Visual Recommendation",components:["embedding-table","candidate-generator","ranker","feature-store","real-time-signals","A/B-test"]},
+  {name:"Amazon Personalize",cat:"rec",type:"Personalization Service",components:["collaborative-filter","feature-store","candidate-generator","ranker","event-tracker","API-gateway"]},
+  {name:"TikTok For-You",cat:"rec",type:"Short Video Rec",components:["multi-tower-model","feature-store","candidate-generator","ranker","real-time-signals","exploration"]},
+  {name:"LinkedIn Feed",cat:"rec",type:"Professional Feed",components:["feature-store","candidate-generator","ranker","diversity-filter","A/B-test","embedding-table"]},
+  {name:"Uber Eats Ranking",cat:"rec",type:"Marketplace Ranking",components:["feature-store","ranker","geo-model","real-time-signals","A/B-test","fairness-filter"]},
+  {name:"Twitter/X Timeline",cat:"rec",type:"Social Feed Ranking",components:["candidate-generator","ranker","feature-store","graph-model","real-time-signals","safety-filter"]},
+  {name:"DoorDash Discovery",cat:"rec",type:"Marketplace Discovery",components:["candidate-generator","ranker","feature-store","geo-model","search-engine","personalization"]},
+
+  // === AGENTIC AI ===
+  {name:"LangChain Agents",cat:"agent",type:"Agent Framework",components:["LLM-router","tool-registry","memory-store","chain-executor","prompt-template","callback-system"]},
+  {name:"AutoGen",cat:"agent",type:"Multi-Agent",components:["agent-orchestrator","conversation-mgr","code-executor","tool-registry","memory-store","group-chat"]},
+  {name:"CrewAI",cat:"agent",type:"Role-based Agents",components:["agent-orchestrator","role-assigner","task-planner","tool-registry","memory-store","delegation"]},
+  {name:"OpenAI Assistants",cat:"agent",type:"Assistant API",components:["LLM-router","tool-registry","file-search","code-interpreter","thread-manager","run-executor"]},
+  {name:"Claude MCP",cat:"agent",type:"Model Context Protocol",components:["protocol-server","tool-registry","resource-provider","context-manager","sampling","transport"]},
+  {name:"Semantic Kernel",cat:"agent",type:"AI Orchestration",components:["planner","plugin-registry","memory-store","prompt-template","function-calling","connector"]},
+  {name:"Vertex AI Agent",cat:"agent",type:"Cloud Agent Builder",components:["agent-orchestrator","tool-registry","grounding","session-mgr","evaluation","deployment"]},
+  {name:"Amazon Bedrock Agents",cat:"agent",type:"Managed Agents",components:["agent-orchestrator","knowledge-base","action-groups","guardrails","session-mgr","tracing"]},
+  {name:"Devin",cat:"agent",type:"Coding Agent",components:["planner","code-generator","terminal-executor","browser-agent","memory-store","self-correction"]},
+  {name:"Autogen Studio",cat:"agent",type:"Agent IDE",components:["agent-orchestrator","workflow-builder","skill-library","model-selector","evaluation","UI-framework"]},
+
+  // === MLOps / PLATFORM ===
+  {name:"Kubeflow",cat:"mlops",type:"ML Platform",components:["pipeline-engine","notebook-server","model-serving","feature-store","experiment-tracker","scheduler"]},
+  {name:"MLflow",cat:"mlops",type:"ML Lifecycle",components:["experiment-tracker","model-registry","model-serving","project-runner","artifact-store","evaluator"]},
+  {name:"Airflow + ML",cat:"mlops",type:"Workflow Orchestration",components:["DAG-scheduler","task-executor","sensor","operator","metadata-db","UI-dashboard"]},
+  {name:"Ray / Ray Serve",cat:"mlops",type:"Distributed Compute",components:["distributed-scheduler","object-store","actor-system","serve-deployment","autoscaler","dashboard"]},
+  {name:"Feast",cat:"mlops",type:"Feature Store",components:["feature-store","online-store","offline-store","registry","transformation","serving-API"]},
+  {name:"Seldon Core",cat:"mlops",type:"Model Serving",components:["model-serving","inference-graph","explainer","drift-detector","A/B-test","canary-router"]},
+  {name:"BentoML",cat:"mlops",type:"Model Serving Framework",components:["model-serving","runner","API-gateway","model-registry","batch-processor","containerizer"]},
+  {name:"Weights & Biases",cat:"mlops",type:"Experiment Platform",components:["experiment-tracker","artifact-store","hyperparameter-sweeper","model-registry","dashboard","evaluator"]},
+  {name:"DVC",cat:"mlops",type:"Data Version Control",components:["data-versioner","pipeline-engine","experiment-tracker","model-registry","remote-storage","diff-tool"]},
+  {name:"Metaflow",cat:"mlops",type:"ML Framework",components:["flow-executor","artifact-store","versioner","scheduler","notebook-integration","cloud-connector"]},
+
+  // === SPEECH / AUDIO ===
+  {name:"Whisper",cat:"speech",type:"Speech Recognition",components:["audio-encoder","text-decoder","tokenizer","language-detector","timestamp-aligner","model-exporter"]},
+  {name:"Bark",cat:"speech",type:"Text-to-Speech",components:["semantic-encoder","coarse-acoustic","fine-acoustic","codec-decoder","speaker-embed","text-preprocessor"]},
+  {name:"ElevenLabs",cat:"speech",type:"Voice Synthesis",components:["voice-cloner","TTS-engine","emotion-control","streaming-synth","API-gateway","voice-store"]},
+  {name:"Speechmatics",cat:"speech",type:"Enterprise ASR",components:["audio-encoder","language-model","diarizer","punctuator","topic-detector","real-time-stream"]},
+  {name:"Tortoise TTS",cat:"speech",type:"High-quality TTS",components:["autoregressive-model","diffusion-model","vocoder","CLVP","text-preprocessor","voice-cloner"]},
+  {name:"AudioCraft",cat:"speech",type:"Audio Generation",components:["EnCodec","transformer","text-conditioner","audio-tokenizer","streaming-decoder","model-exporter"]},
+  {name:"Descript Audio",cat:"speech",type:"Audio Editing AI",components:["transcription","text-to-speech","voice-cloner","audio-editor","filler-detector","overdub"]},
+  {name:"AssemblyAI",cat:"speech",type:"Speech Intelligence",components:["audio-encoder","transcription","diarizer","summarizer","sentiment-analyzer","entity-extractor"]},
+  {name:"Piper TTS",cat:"speech",type:"Local TTS",components:["VITS-model","text-preprocessor","phonemizer","vocoder","model-exporter","streaming-synth"]},
+  {name:"Faster Whisper",cat:"speech",type:"Optimized ASR",components:["CTranslate2","audio-encoder","text-decoder","VAD","quantizer","batch-processor"]},
+
+  // === GENERATIVE AI ===
+  {name:"Stable Diffusion 3",cat:"gen",type:"Image Generation",components:["DiT","VAE","text-encoder","scheduler","latent-space","conditioning","LoRA-adapter"]},
+  {name:"DALL-E 3",cat:"gen",type:"Text-to-Image",components:["diffusion-model","CLIP","text-encoder","safety-filter","upscaler","prompt-rewriter"]},
+  {name:"Midjourney v6",cat:"gen",type:"Image Generation",components:["diffusion-model","text-encoder","upscaler","style-mixer","variation-gen","prompt-parser"]},
+  {name:"Sora",cat:"gen",type:"Video Generation",components:["DiT","VAE","text-encoder","temporal-attn","spatial-attn","scheduler","frame-interpolator"]},
+  {name:"Runway Gen-3",cat:"gen",type:"Video Generation",components:["video-diffusion","text-encoder","motion-model","frame-interp","style-transfer","editor"]},
+  {name:"ControlNet",cat:"gen",type:"Guided Generation",components:["condition-encoder","diffusion-model","zero-conv","feature-injector","preprocessor","scheduler"]},
+  {name:"AnimateDiff",cat:"gen",type:"Video Animation",components:["motion-module","diffusion-model","temporal-attn","frame-interp","LoRA-adapter","scheduler"]},
+  {name:"Flux",cat:"gen",type:"Flow Matching",components:["DiT","rectified-flow","text-encoder","VAE","scheduler","guidance-distill","LoRA-adapter"]},
+  {name:"MusicGen",cat:"gen",type:"Music Generation",components:["EnCodec","transformer","text-conditioner","audio-tokenizer","streaming-decoder","tempo-control"]},
+  {name:"Point-E/Shap-E",cat:"gen",type:"3D Generation",components:["point-cloud-gen","diffusion-model","text-conditioner","mesh-converter","SDF-model","renderer"]},
+
+  // === AutoML / AutoDL ===
+  {name:"Google AutoML",cat:"auto",type:"Automated ML",components:["NAS-controller","hyperparameter-tuner","feature-engineer","model-selector","evaluator","deployer"]},
+  {name:"H2O AutoML",cat:"auto",type:"AutoML Platform",components:["model-selector","hyperparameter-tuner","stacker","feature-engineer","leaderboard","explainer"]},
+  {name:"Auto-sklearn",cat:"auto",type:"Scikit-learn AutoML",components:["meta-learner","hyperparameter-tuner","ensemble-builder","feature-preprocessor","evaluator"]},
+  {name:"FLAML",cat:"auto",type:"Lightweight AutoML",components:["cost-effective-tuner","model-selector","feature-engineer","evaluator","resource-allocator"]},
+  {name:"AutoGluon",cat:"auto",type:"AutoML Toolkit",components:["model-selector","stacker","hyperparameter-tuner","feature-engineer","evaluator","predictor"]},
+  {name:"NNI",cat:"auto",type:"Neural Architecture Search",components:["NAS-controller","tuner","assessor","trial-runner","experiment-manager","model-compressor"]},
+  {name:"Optuna",cat:"auto",type:"Hyperparameter Optimization",components:["sampler","pruner","study-manager","visualization","distributed-optimizer","storage"]},
+  {name:"Keras Tuner",cat:"auto",type:"Neural Network Tuner",components:["hyperparameter-tuner","oracle","tuner-base","hypermodel","trial-runner","evaluator"]},
+  {name:"Ludwig",cat:"auto",type:"Declarative ML",components:["config-parser","encoder","combiner","decoder","trainer","predictor","hyperparameter-tuner"]},
+  {name:"PyCaret",cat:"auto",type:"Low-code ML",components:["model-selector","feature-engineer","hyperparameter-tuner","stacker","evaluator","deployer"]},
+
+  // === EDGE / EMBEDDED ===
+  {name:"TensorFlow Lite",cat:"edge",type:"Mobile ML",components:["model-converter","quantizer","interpreter","delegate","model-optimizer","benchmark"]},
+  {name:"ONNX Runtime",cat:"edge",type:"Cross-platform Inference",components:["model-converter","graph-optimizer","execution-provider","quantizer","inference-engine"]},
+  {name:"TensorRT",cat:"edge",type:"GPU Inference Optimizer",components:["model-parser","layer-fuser","kernel-autotuner","precision-calibrator","engine-builder"]},
+  {name:"Core ML",cat:"edge",type:"Apple ML Framework",components:["model-converter","neural-engine","inference-engine","model-optimizer","on-device-training"]},
+  {name:"vLLM",cat:"edge",type:"LLM Inference Engine",components:["PagedAttention","continuous-batcher","KV-cache-mgr","model-loader","quantizer","API-server"]},
+  {name:"llama.cpp",cat:"edge",type:"Local LLM Inference",components:["GGUF-loader","quantizer","inference-engine","KV-cache","batch-processor","metal-backend"]},
+  {name:"Triton Inference",cat:"edge",type:"Model Serving Platform",components:["model-repository","scheduler","backend-loader","ensemble-pipeline","metrics","dynamic-batcher"]},
+  {name:"OpenVINO",cat:"edge",type:"Intel Inference",components:["model-optimizer","inference-engine","plugin-system","benchmark","quantizer","model-converter"]},
+  {name:"ExecuTorch",cat:"edge",type:"PyTorch Edge",components:["model-exporter","runtime","delegate","memory-planner","quantizer","profile-tool"]},
+  {name:"DeepSparse",cat:"edge",type:"Sparse Inference",components:["sparse-engine","model-pruner","quantizer","pipeline-builder","benchmark","model-converter"]},
+];
+
+const catColors = {
+  llm:"#00d4aa", cv:"#7c6aff", nlp:"#ffd93d", rec:"#ff6b6b",
+  agent:"#4ecdc4", mlops:"#ff9f43", speech:"#a29bfe", gen:"#fd79a8",
+  auto:"#6c5ce7", edge:"#00b894"
+};
+
+const catNames = {
+  llm:"LLM / Foundation Models", cv:"Computer Vision", nlp:"NLP / Search & Retrieval",
+  rec:"Recommendation Systems", agent:"Agentic AI", mlops:"MLOps / Platform",
+  speech:"Speech / Audio", gen:"Generative AI", auto:"AutoML / AutoDL", edge:"Edge / Inference"
+};
+
+function getComponentClass(c) {
+  if (["data-loader","feature-store","data-augmentor","data-versioner","embedding-table","online-store","offline-store","vector-store","document-store","artifact-store","memory-store","memory-bank","object-store","metadata-db","index-builder","inverted-index","remote-storage","embedding-store","voice-store","model-repository"].includes(c)) return "data";
+  if (["transformer","CNN-backbone","vision-transformer","vision-encoder","text-encoder","audio-encoder","BERT-encoder","diffusion-model","DiT","VAE","vocoder","motion-module","semantic-encoder","VITS-model","EnCodec","graph-model","multi-tower-model"].includes(c)) return "model";
+  if (["model-serving","API-gateway","inference-engine","serve-deployment","serving-layer","serving-API","API-server","streaming-synth","real-time-stream","interpreter"].includes(c)) return "serve";
+  if (["evaluator","A/B-test","drift-detector","experiment-tracker","safety-filter","explainer","benchmark","dashboard","leaderboard","metrics","guardrails"].includes(c)) return "monitor";
+  return "";
+}
+
+function renderSystems() {
+  const grid = document.getElementById('systems-grid');
+  let html = '';
+  const cats = ['llm','cv','nlp','rec','agent','mlops','speech','gen','auto','edge'];
+  cats.forEach(cat => {
+    const catSystems = systems.filter(s => s.cat === cat);
+    html += `<div class="category-header" data-cat="${cat}">
+      <div class="dot" style="background:${catColors[cat]}"></div>
+      <h3>${catNames[cat]}</h3>
+      <span>${catSystems.length} systems</span>
+    </div>`;
+    catSystems.forEach(s => {
+      html += `<div class="system-card" data-cat="${s.cat}" data-search="${(s.name+' '+s.type+' '+s.components.join(' ')).toLowerCase()}">
+        <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${catColors[s.cat]};border-radius:8px 0 0 8px;"></div>
+        <div class="name">${s.name}</div>
+        <div class="type">${s.type}</div>
+        <div class="components">
+          ${s.components.slice(0,5).map(c => `<span class="component-tag ${getComponentClass(c)}">${c}</span>`).join('')}
+          ${s.components.length > 5 ? `<span class="component-tag">+${s.components.length-5}</span>` : ''}
+        </div>
+      </div>`;
+    });
+  });
+  grid.innerHTML = html;
+}
+
+function filterSystems() {
+  const q = document.getElementById('search-systems').value.toLowerCase();
+  document.querySelectorAll('.system-card').forEach(el => {
+    el.style.display = el.dataset.search.includes(q) ? '' : 'none';
+  });
+}
+
+function filterCategory(cat, btn) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.system-card').forEach(el => {
+    el.style.display = (cat === 'all' || el.dataset.cat === cat) ? '' : 'none';
+  });
+  document.querySelectorAll('.category-header').forEach(el => {
+    el.style.display = (cat === 'all' || el.dataset.cat === cat) ? '' : 'none';
+  });
+}
+
+// ============================================
+// DATA: 28 DESIGN PATTERNS
+// ============================================
+const patterns = [
+  {layer:"Data Ingestion",name:"Stream Ingestor",desc:"Continuously ingests data from Kafka, Pub/Sub, or event streams. Handles backpressure, schema validation, and dead-letter routing.",k8s:"Deployment + HPA + PVC",usedBy:"95/100 systems",icon:"📥"},
+  {layer:"Data Ingestion",name:"Batch Loader",desc:"Scheduled extraction from databases, APIs, data lakes, and file systems. Supports incremental loads, deduplication, and checkpointing.",k8s:"CronJob + PVC + ConfigMap",usedBy:"80/100 systems",icon:"📦"},
+  {layer:"Data Ingestion",name:"Web Scraper / Crawler",desc:"Structured extraction from web sources with rate limiting, proxy rotation, and content parsing pipelines.",k8s:"Job + ConfigMap + Secret",usedBy:"30/100 systems",icon:"🕷️"},
+  {layer:"Feature Engineering",name:"Feature Store (Online/Offline)",desc:"Centralized repository for computed features with online (low-latency Redis/DynamoDB) and offline (Parquet/Delta) stores. Ensures training-serving consistency.",k8s:"StatefulSet + Service + PVC",usedBy:"72/100 systems",icon:"🗄️"},
+  {layer:"Feature Engineering",name:"Embedding Generator",desc:"Produces dense vector representations from text, images, audio, or structured data using pre-trained encoders. Writes to vector stores.",k8s:"Deployment + GPU + HPA",usedBy:"88/100 systems",icon:"🔢"},
+  {layer:"Feature Engineering",name:"Data Transformer",desc:"Applies cleaning, normalization, tokenization, augmentation, and schema transformations. Supports both batch and streaming modes.",k8s:"Deployment + HPA + ConfigMap",usedBy:"100/100 systems",icon:"⚙️"},
+  {layer:"Feature Engineering",name:"Vector Indexer",desc:"Builds and maintains ANN indices (HNSW, IVF, ScaNN) over embedding collections for fast similarity search.",k8s:"StatefulSet + PVC + Service",usedBy:"65/100 systems",icon:"🔍"},
+  {layer:"Model Training",name:"Distributed Trainer",desc:"Orchestrates multi-GPU/multi-node training with data parallelism, model parallelism, or pipeline parallelism. Handles checkpointing and fault tolerance.",k8s:"PyTorchJob / TFJob + PVC + GPU",usedBy:"70/100 systems",icon:"🏋️"},
+  {layer:"Model Training",name:"Hyperparameter Tuner",desc:"Automated search over hyperparameter space using Bayesian optimization, evolutionary strategies, or grid/random search with early stopping.",k8s:"Job (parallel) + ConfigMap",usedBy:"68/100 systems",icon:"🎛️"},
+  {layer:"Model Training",name:"Fine-Tuner / Adapter",desc:"Efficient adaptation of pre-trained models via LoRA, QLoRA, prefix tuning, or full fine-tuning on domain-specific data.",k8s:"Job + GPU + PVC + ConfigMap",usedBy:"75/100 systems",icon:"🔧"},
+  {layer:"Model Training",name:"Reinforcement Learning Loop",desc:"Training loop with environment interaction, reward modeling, PPO/DPO optimization, and policy iteration for RLHF/RLAIF.",k8s:"StatefulSet + GPU + Service",usedBy:"25/100 systems",icon:"🎮"},
+  {layer:"Model Management",name:"Model Registry",desc:"Versioned storage for trained models with metadata, lineage tracking, stage transitions (staging→production), and approval workflows.",k8s:"Deployment + PVC + Service",usedBy:"85/100 systems",icon:"📋"},
+  {layer:"Model Management",name:"Model Optimizer / Quantizer",desc:"Post-training optimization including quantization (INT8/FP16/GPTQ/AWQ), pruning, distillation, and graph optimization for deployment targets.",k8s:"Job + GPU + PVC",usedBy:"60/100 systems",icon:"📐"},
+  {layer:"Model Management",name:"Experiment Tracker",desc:"Records experiments with parameters, metrics, artifacts, and comparison dashboards. Enables reproducibility and collaboration.",k8s:"Deployment + PVC + Service",usedBy:"78/100 systems",icon:"📊"},
+  {layer:"Model Serving",name:"Real-time Inference Server",desc:"Low-latency model serving with dynamic batching, model warmup, multi-model support, and health checking. Supports gRPC and REST.",k8s:"Deployment + HPA + Service + GPU",usedBy:"92/100 systems",icon:"⚡"},
+  {layer:"Model Serving",name:"Batch Inference Processor",desc:"Large-scale offline prediction over datasets. Supports checkpointing, parallelism, and output to storage sinks.",k8s:"Job (parallel) + PVC",usedBy:"55/100 systems",icon:"📄"},
+  {layer:"Model Serving",name:"Streaming Inference",desc:"Continuous inference on data streams with stateful processing, windowing, and real-time feature joining.",k8s:"Deployment + HPA + StatefulSet",usedBy:"40/100 systems",icon:"🌊"},
+  {layer:"Model Serving",name:"Inference Graph / Ensemble",desc:"Multi-model pipelines where output of one model feeds another. Supports A/B testing, canary routing, and ensemble aggregation.",k8s:"Deployment + VirtualService",usedBy:"50/100 systems",icon:"🔗"},
+  {layer:"Orchestration",name:"Pipeline Orchestrator",desc:"DAG-based workflow execution with retry logic, conditional branching, parametric triggers, and dependency management.",k8s:"Deployment + CRD + ServiceAccount",usedBy:"90/100 systems",icon:"🎯"},
+  {layer:"Orchestration",name:"Agent Router / Orchestrator",desc:"Routes requests to specialized agents, manages multi-turn conversations, tool selection, and execution delegation in agentic systems.",k8s:"Deployment + Service + ConfigMap",usedBy:"35/100 systems",icon:"🤖"},
+  {layer:"Orchestration",name:"Tool Registry",desc:"Dynamic catalog of callable tools/functions/APIs with schema definitions, authentication, and usage tracking.",k8s:"Deployment + ConfigMap + Secret",usedBy:"40/100 systems",icon:"🧰"},
+  {layer:"Orchestration",name:"Prompt Manager / Template Engine",desc:"Version-controlled prompt templates with variable substitution, A/B testing, and performance tracking.",k8s:"Deployment + ConfigMap + PVC",usedBy:"60/100 systems",icon:"📝"},
+  {layer:"Monitoring",name:"Drift Detector",desc:"Monitors data distribution drift, concept drift, and prediction drift using statistical tests and reference distributions.",k8s:"CronJob + Service + ConfigMap",usedBy:"45/100 systems",icon:"📉"},
+  {layer:"Monitoring",name:"Performance Monitor",desc:"Tracks latency, throughput, error rates, GPU utilization, and custom ML metrics with alerting and dashboards.",k8s:"DaemonSet + Service + ConfigMap",usedBy:"95/100 systems",icon:"📈"},
+  {layer:"Monitoring",name:"Safety / Guardrail Filter",desc:"Input/output filtering for toxicity, PII, prompt injection, hallucination detection, and policy compliance.",k8s:"Deployment + HPA + ConfigMap",usedBy:"55/100 systems",icon:"🛡️"},
+  {layer:"Monitoring",name:"A/B Test Controller",desc:"Traffic splitting, experiment assignment, metric collection, and statistical significance calculation for model experiments.",k8s:"Deployment + VirtualService",usedBy:"60/100 systems",icon:"🧪"},
+  {layer:"Infrastructure",name:"GPU Scheduler",desc:"Intelligent GPU allocation with fractional GPUs, time-slicing, MIG, and topology-aware scheduling.",k8s:"Device Plugin + Scheduler Extender",usedBy:"70/100 systems",icon:"🖥️"},
+  {layer:"Infrastructure",name:"Cache Layer",desc:"Multi-tier caching for embeddings, KV-cache, model outputs, and feature values with TTL and invalidation policies.",k8s:"StatefulSet (Redis/Memcached) + Service",usedBy:"82/100 systems",icon:"💾"},
+];
+
+function renderPatterns() {
+  const grid = document.getElementById('pattern-grid');
+  grid.innerHTML = patterns.map(p => `
+    <div class="pattern-card">
+      <div class="layer">${p.layer}</div>
+      <h4>${p.icon} ${p.name}</h4>
+      <div class="desc">${p.desc}</div>
+      <div class="k8s-ref">K8s: ${p.k8s}</div>
+      <div class="used-by">Found in <strong>${p.usedBy}</strong> analyzed systems</div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// DATA: K8S POD LIBRARY
+// ============================================
+const podNamespaces = [
+  {ns:"aiml-data",label:"Data Layer",color:"#ffd93d",pods:[
+    {name:"stream-ingestor",desc:"Kafka/Pub-Sub consumer with schema validation",resources:"256Mi-1Gi RAM, 0.5-2 CPU",image:"aiml/stream-ingestor:latest"},
+    {name:"batch-loader",desc:"Scheduled ETL from databases and APIs",resources:"512Mi-2Gi RAM, 0.5-2 CPU",image:"aiml/batch-loader:latest"},
+    {name:"data-transformer",desc:"Cleaning, normalization, augmentation",resources:"512Mi-4Gi RAM, 1-4 CPU",image:"aiml/data-transformer:latest"},
+    {name:"feature-store-online",desc:"Redis-backed low-latency feature serving",resources:"1-8Gi RAM, 1-2 CPU",image:"aiml/feature-store-online:latest"},
+    {name:"feature-store-offline",desc:"Parquet/Delta offline feature storage",resources:"2-16Gi RAM, 2-4 CPU",image:"aiml/feature-store-offline:latest"},
+    {name:"data-versioner",desc:"Dataset versioning and lineage tracking",resources:"256Mi-1Gi RAM, 0.5-1 CPU",image:"aiml/data-versioner:latest"},
+  ]},
+  {ns:"aiml-embedding",label:"Embedding & Retrieval",color:"#7c6aff",pods:[
+    {name:"embedding-generator",desc:"Dense vector generation from any modality",resources:"2-8Gi RAM, 1 GPU",image:"aiml/embedding-gen:latest"},
+    {name:"vector-store",desc:"HNSW/IVF index for similarity search",resources:"4-32Gi RAM, 2-8 CPU",image:"aiml/vector-store:latest"},
+    {name:"reranker",desc:"Cross-encoder neural reranking",resources:"2-8Gi RAM, 1 GPU",image:"aiml/reranker:latest"},
+    {name:"retriever",desc:"Hybrid BM25 + vector retrieval",resources:"1-4Gi RAM, 1-2 CPU",image:"aiml/retriever:latest"},
+    {name:"rag-engine",desc:"Retrieval-augmented generation orchestrator",resources:"1-4Gi RAM, 1-2 CPU",image:"aiml/rag-engine:latest"},
+  ]},
+  {ns:"aiml-training",label:"Training & Optimization",color:"#ff6b6b",pods:[
+    {name:"distributed-trainer",desc:"Multi-GPU/node training orchestrator",resources:"16-64Gi RAM, 1-8 GPU",image:"aiml/distributed-trainer:latest"},
+    {name:"fine-tuner",desc:"LoRA/QLoRA/full fine-tuning",resources:"8-32Gi RAM, 1-4 GPU",image:"aiml/fine-tuner:latest"},
+    {name:"hparam-tuner",desc:"Bayesian/evolutionary HP optimization",resources:"1-4Gi RAM, 0.5-2 CPU",image:"aiml/hparam-tuner:latest"},
+    {name:"rl-trainer",desc:"RLHF/DPO/PPO training loop",resources:"16-64Gi RAM, 2-8 GPU",image:"aiml/rl-trainer:latest"},
+    {name:"model-optimizer",desc:"Quantization, pruning, distillation",resources:"8-16Gi RAM, 1-2 GPU",image:"aiml/model-optimizer:latest"},
+    {name:"experiment-tracker",desc:"MLflow/W&B compatible tracking server",resources:"512Mi-2Gi RAM, 0.5-1 CPU",image:"aiml/experiment-tracker:latest"},
+  ]},
+  {ns:"aiml-serving",label:"Model Serving",color:"#00d4aa",pods:[
+    {name:"inference-server",desc:"Real-time model serving (Triton/vLLM)",resources:"4-32Gi RAM, 1-4 GPU",image:"aiml/inference-server:latest"},
+    {name:"batch-predictor",desc:"Large-scale offline inference",resources:"4-16Gi RAM, 1-2 GPU",image:"aiml/batch-predictor:latest"},
+    {name:"stream-predictor",desc:"Continuous streaming inference",resources:"2-8Gi RAM, 1 GPU",image:"aiml/stream-predictor:latest"},
+    {name:"model-router",desc:"A/B test, canary, ensemble routing",resources:"256Mi-1Gi RAM, 0.5-1 CPU",image:"aiml/model-router:latest"},
+    {name:"cache-layer",desc:"Redis/Memcached for predictions & KV-cache",resources:"2-16Gi RAM, 1-2 CPU",image:"aiml/cache-layer:latest"},
+    {name:"api-gateway",desc:"Rate limiting, auth, request shaping",resources:"256Mi-1Gi RAM, 0.5-2 CPU",image:"aiml/api-gateway:latest"},
+  ]},
+  {ns:"aiml-orchestration",label:"Orchestration & Agents",color:"#4ecdc4",pods:[
+    {name:"pipeline-orchestrator",desc:"DAG workflow engine (Argo/Kubeflow)",resources:"512Mi-2Gi RAM, 0.5-2 CPU",image:"aiml/pipeline-orch:latest"},
+    {name:"agent-router",desc:"Multi-agent orchestration and delegation",resources:"512Mi-2Gi RAM, 0.5-2 CPU",image:"aiml/agent-router:latest"},
+    {name:"tool-registry",desc:"Dynamic tool/function catalog",resources:"256Mi-1Gi RAM, 0.5-1 CPU",image:"aiml/tool-registry:latest"},
+    {name:"prompt-manager",desc:"Versioned prompt template engine",resources:"256Mi-512Mi RAM, 0.25-0.5 CPU",image:"aiml/prompt-mgr:latest"},
+    {name:"memory-store",desc:"Conversation/agent memory backend",resources:"1-4Gi RAM, 0.5-1 CPU",image:"aiml/memory-store:latest"},
+    {name:"scheduler",desc:"Job scheduling and resource allocation",resources:"256Mi-1Gi RAM, 0.5-1 CPU",image:"aiml/scheduler:latest"},
+  ]},
+  {ns:"aiml-monitoring",label:"Monitoring & Safety",color:"#ff9f43",pods:[
+    {name:"drift-detector",desc:"Data and concept drift monitoring",resources:"512Mi-2Gi RAM, 0.5-1 CPU",image:"aiml/drift-detector:latest"},
+    {name:"perf-monitor",desc:"Latency, throughput, GPU metrics",resources:"256Mi-1Gi RAM, 0.25-0.5 CPU",image:"aiml/perf-monitor:latest"},
+    {name:"safety-filter",desc:"Toxicity, PII, prompt injection guard",resources:"1-4Gi RAM, 0.5-1 GPU",image:"aiml/safety-filter:latest"},
+    {name:"ab-controller",desc:"Experiment traffic splitting",resources:"256Mi-512Mi RAM, 0.25-0.5 CPU",image:"aiml/ab-controller:latest"},
+    {name:"model-registry",desc:"Versioned model artifact store",resources:"512Mi-2Gi RAM, 0.5-1 CPU",image:"aiml/model-registry:latest"},
+    {name:"alerting",desc:"Threshold-based alerting to Slack/PD",resources:"128Mi-512Mi RAM, 0.25 CPU",image:"aiml/alerting:latest"},
+  ]},
+  {ns:"aiml-infra",label:"Infrastructure",color:"#a29bfe",pods:[
+    {name:"gpu-scheduler",desc:"Fractional GPU and topology scheduling",resources:"256Mi-1Gi RAM, 0.5 CPU",image:"aiml/gpu-scheduler:latest"},
+    {name:"autoscaler",desc:"Custom HPA for ML workloads",resources:"256Mi-512Mi RAM, 0.25-0.5 CPU",image:"aiml/autoscaler:latest"},
+    {name:"log-aggregator",desc:"Centralized logging for all pods",resources:"512Mi-2Gi RAM, 0.5-1 CPU",image:"aiml/log-aggregator:latest"},
+  ]},
+];
+
+function renderPods() {
+  const container = document.getElementById('pods-content');
+  container.innerHTML = podNamespaces.map(ns => `
+    <div class="arch-section">
+      <h3 style="color:${ns.color}">⬡ ${ns.label}</h3>
+      <div class="subtitle">namespace: ${ns.ns} — ${ns.pods.length} pod definitions</div>
+      <div class="pod-grid">
+        ${ns.pods.map(p => `
+          <div class="pod-card">
+            <div class="pod-icon" style="background:${ns.color}22;color:${ns.color}">⬡</div>
+            <h5>${p.name}</h5>
+            <div class="pod-desc">${p.desc}</div>
+            <div class="pod-meta">
+              <span>${p.resources}</span>
+              <span>${p.image}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// REFERENCE PIPELINES
+// ============================================
+const pipelines = [
+  {name:"RAG Pipeline",desc:"Retrieval-Augmented Generation for enterprise Q&A",nodes:[
+    {icon:"📥",name:"stream-ingestor",type:"data"},
+    {icon:"⚙️",name:"data-transformer",type:"data"},
+    {icon:"🔢",name:"embedding-gen",type:"embedding"},
+    {icon:"🔍",name:"vector-store",type:"embedding"},
+    {icon:"🔗",name:"retriever",type:"embedding"},
+    {icon:"📝",name:"prompt-manager",type:"orchestration"},
+    {icon:"⚡",name:"inference-server",type:"serving"},
+    {icon:"🛡️",name:"safety-filter",type:"monitoring"},
+    {icon:"📈",name:"perf-monitor",type:"monitoring"},
+  ]},
+  {name:"Recommendation Pipeline",desc:"Real-time personalized content recommendations",nodes:[
+    {icon:"📥",name:"stream-ingestor",type:"data"},
+    {icon:"🗄️",name:"feature-store",type:"data"},
+    {icon:"🔢",name:"embedding-gen",type:"embedding"},
+    {icon:"🎯",name:"candidate-gen",type:"serving"},
+    {icon:"⚡",name:"ranker",type:"serving"},
+    {icon:"🔗",name:"model-router",type:"serving"},
+    {icon:"🧪",name:"ab-controller",type:"monitoring"},
+    {icon:"💾",name:"cache-layer",type:"serving"},
+    {icon:"📈",name:"perf-monitor",type:"monitoring"},
+  ]},
+  {name:"LLM Fine-tuning Pipeline",desc:"End-to-end fine-tuning with evaluation and deployment",nodes:[
+    {icon:"📦",name:"batch-loader",type:"data"},
+    {icon:"⚙️",name:"data-transformer",type:"data"},
+    {icon:"🗄️",name:"data-versioner",type:"data"},
+    {icon:"🔧",name:"fine-tuner",type:"training"},
+    {icon:"📊",name:"experiment-tracker",type:"training"},
+    {icon:"📐",name:"model-optimizer",type:"training"},
+    {icon:"📋",name:"model-registry",type:"monitoring"},
+    {icon:"⚡",name:"inference-server",type:"serving"},
+    {icon:"📉",name:"drift-detector",type:"monitoring"},
+  ]},
+  {name:"Agentic AI Pipeline",desc:"Multi-agent system with tool use and memory",nodes:[
+    {icon:"📝",name:"prompt-manager",type:"orchestration"},
+    {icon:"🤖",name:"agent-router",type:"orchestration"},
+    {icon:"🧰",name:"tool-registry",type:"orchestration"},
+    {icon:"⚡",name:"inference-server",type:"serving"},
+    {icon:"🔍",name:"retriever",type:"embedding"},
+    {icon:"💾",name:"memory-store",type:"orchestration"},
+    {icon:"🛡️",name:"safety-filter",type:"monitoring"},
+    {icon:"📈",name:"perf-monitor",type:"monitoring"},
+  ]},
+  {name:"Computer Vision Pipeline",desc:"Object detection / segmentation training and serving",nodes:[
+    {icon:"📥",name:"stream-ingestor",type:"data"},
+    {icon:"⚙️",name:"data-transformer",type:"data"},
+    {icon:"🗄️",name:"data-versioner",type:"data"},
+    {icon:"🏋️",name:"distributed-trainer",type:"training"},
+    {icon:"🎛️",name:"hparam-tuner",type:"training"},
+    {icon:"📐",name:"model-optimizer",type:"training"},
+    {icon:"📋",name:"model-registry",type:"monitoring"},
+    {icon:"⚡",name:"inference-server",type:"serving"},
+    {icon:"🌊",name:"stream-predictor",type:"serving"},
+  ]},
+  {name:"Generative Media Pipeline",desc:"Text-to-image/video generation with safety",nodes:[
+    {icon:"📝",name:"prompt-manager",type:"orchestration"},
+    {icon:"🛡️",name:"safety-filter",type:"monitoring"},
+    {icon:"⚡",name:"inference-server",type:"serving"},
+    {icon:"💾",name:"cache-layer",type:"serving"},
+    {icon:"📈",name:"perf-monitor",type:"monitoring"},
+    {icon:"🧪",name:"ab-controller",type:"monitoring"},
+  ]},
+];
+
+function renderPipelines() {
+  const container = document.getElementById('pipelines-content');
+  container.innerHTML = pipelines.map(p => `
+    <div style="margin-bottom:30px;">
+      <h4 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:4px;">${p.name}</h4>
+      <p style="color:var(--text-dim);font-size:12px;margin-bottom:14px;">${p.desc}</p>
+      <div class="pipeline-canvas">
+        <div class="pipeline-flow">
+          ${p.nodes.map((n, i) => `
+            <div class="pipeline-node">
+              <div class="node-icon">${n.icon}</div>
+              <div class="node-name">${n.name}</div>
+              <div class="node-type">${n.type}</div>
+            </div>
+            ${i < p.nodes.length - 1 ? '<div class="pipeline-arrow"></div>' : ''}
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// CODE TAB
+// ============================================
+function renderCode() {
+  document.getElementById('code-content').innerHTML = `
+<div class="code-block">
+<div class="code-header"><span class="filename">namespace.yaml</span><span class="lang">Kubernetes</span></div>
+<div class="code-body">apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiml-data
+  labels:
+    app.kubernetes.io/part-of: aiml-platform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiml-embedding
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiml-training
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiml-serving
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiml-orchestration
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiml-monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiml-infra</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><span class="filename">inference-server.yaml</span><span class="lang">Kubernetes — Model Serving Pod</span></div>
+<div class="code-body">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-server
+  namespace: aiml-serving
+  labels:
+    app: inference-server
+    pattern: real-time-inference
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inference-server
+  template:
+    metadata:
+      labels:
+        app: inference-server
+    spec:
+      containers:
+      - name: inference-server
+        image: aiml/inference-server:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8081
+          name: grpc
+        - containerPort: 9090
+          name: metrics
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+            nvidia.com/gpu: "1"
+          limits:
+            memory: "32Gi"
+            cpu: "8"
+            nvidia.com/gpu: "1"
+        env:
+        - name: MODEL_REPOSITORY
+          value: "/models"
+        - name: MAX_BATCH_SIZE
+          value: "32"
+        - name: ENABLE_GPU
+          value: "true"
+        volumeMounts:
+        - name: model-storage
+          mountPath: /models
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 5
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: model-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inference-server
+  namespace: aiml-serving
+spec:
+  selector:
+    app: inference-server
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: grpc
+    port: 8081
+    targetPort: 8081
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: inference-server-hpa
+  namespace: aiml-serving
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: inference-server
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: gpu_utilization
+      target:
+        type: AverageValue
+        averageValue: "70"
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><span class="filename">embedding-generator.yaml</span><span class="lang">Kubernetes — Embedding Pod</span></div>
+<div class="code-body">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embedding-generator
+  namespace: aiml-embedding
+  labels:
+    app: embedding-generator
+    pattern: embedding-generator
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: embedding-generator
+  template:
+    metadata:
+      labels:
+        app: embedding-generator
+    spec:
+      containers:
+      - name: embedding-gen
+        image: aiml/embedding-gen:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+            nvidia.com/gpu: "1"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+            nvidia.com/gpu: "1"
+        env:
+        - name: MODEL_NAME
+          value: "bge-large-en-v1.5"
+        - name: MAX_BATCH_SIZE
+          value: "64"
+        - name: VECTOR_DIM
+          value: "1024"
+        - name: OUTPUT_SINK
+          value: "vector-store.aiml-embedding.svc:6333"</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><span class="filename">rag-pipeline.yaml</span><span class="lang">Argo Workflows — RAG Pipeline Definition</span></div>
+<div class="code-body">apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: rag-pipeline-
+  namespace: aiml-orchestration
+spec:
+  entrypoint: rag-pipeline
+  templates:
+  - name: rag-pipeline
+    dag:
+      tasks:
+      - name: ingest
+        template: run-pod
+        arguments:
+          parameters:
+          - name: image
+            value: aiml/stream-ingestor:latest
+          - name: args
+            value: "--source=s3://data --output=kafka://raw-docs"
+      - name: transform
+        dependencies: [ingest]
+        template: run-pod
+        arguments:
+          parameters:
+          - name: image
+            value: aiml/data-transformer:latest
+          - name: args
+            value: "--input=kafka://raw-docs --output=kafka://clean-docs"
+      - name: embed
+        dependencies: [transform]
+        template: run-pod-gpu
+        arguments:
+          parameters:
+          - name: image
+            value: aiml/embedding-gen:latest
+          - name: args
+            value: "--input=kafka://clean-docs --output=qdrant://embeddings"
+      - name: index
+        dependencies: [embed]
+        template: run-pod
+        arguments:
+          parameters:
+          - name: image
+            value: aiml/vector-store:latest
+          - name: args
+            value: "--rebuild-index --collection=embeddings"
+
+  - name: run-pod
+    inputs:
+      parameters:
+      - name: image
+      - name: args
+    container:
+      image: "{{inputs.parameters.image}}"
+      command: ["/bin/sh", "-c"]
+      args: ["{{inputs.parameters.args}}"]
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "1"
+
+  - name: run-pod-gpu
+    inputs:
+      parameters:
+      - name: image
+      - name: args
+    container:
+      image: "{{inputs.parameters.image}}"
+      command: ["/bin/sh", "-c"]
+      args: ["{{inputs.parameters.args}}"]
+      resources:
+        requests:
+          memory: "4Gi"
+          cpu: "2"
+          nvidia.com/gpu: "1"</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><span class="filename">fine-tuning-job.yaml</span><span class="lang">Kubeflow — PyTorchJob</span></div>
+<div class="code-body">apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+metadata:
+  name: llm-finetune
+  namespace: aiml-training
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+          - name: pytorch
+            image: aiml/fine-tuner:latest
+            command:
+            - python
+            - -m
+            - torch.distributed.launch
+            args:
+            - "--nproc_per_node=4"
+            - "train.py"
+            - "--model_name=meta-llama/Llama-3.1-8B"
+            - "--lora_r=16"
+            - "--lora_alpha=32"
+            - "--dataset=s3://training-data/sft.jsonl"
+            - "--output_dir=/checkpoints"
+            - "--num_epochs=3"
+            - "--batch_size=4"
+            - "--learning_rate=2e-4"
+            resources:
+              requests:
+                memory: "32Gi"
+                cpu: "8"
+                nvidia.com/gpu: "4"
+              limits:
+                memory: "64Gi"
+                nvidia.com/gpu: "4"
+            volumeMounts:
+            - name: checkpoints
+              mountPath: /checkpoints
+            - name: shm
+              mountPath: /dev/shm
+          volumes:
+          - name: checkpoints
+            persistentVolumeClaim:
+              claimName: training-checkpoints
+          - name: shm
+            emptyDir:
+              medium: Memory
+              sizeLimit: "16Gi"
+    Worker:
+      replicas: 3
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+          - name: pytorch
+            image: aiml/fine-tuner:latest
+            resources:
+              requests:
+                nvidia.com/gpu: "4"
+              limits:
+                nvidia.com/gpu: "4"</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><span class="filename">safety-filter.yaml</span><span class="lang">Kubernetes — Guardrail Sidecar Pattern</span></div>
+<div class="code-body">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: safety-filter
+  namespace: aiml-monitoring
+  labels:
+    app: safety-filter
+    pattern: guardrail-filter
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: safety-filter
+  template:
+    spec:
+      containers:
+      - name: safety-filter
+        image: aiml/safety-filter:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TOXICITY_THRESHOLD
+          value: "0.7"
+        - name: PII_DETECTION
+          value: "true"
+        - name: PROMPT_INJECTION_GUARD
+          value: "true"
+        - name: HALLUCINATION_CHECK
+          value: "true"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+            nvidia.com/gpu: "1"
+---
+# Use as Istio EnvoyFilter for automatic injection
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: safety-filter-injection
+  namespace: aiml-serving
+spec:
+  workloadSelector:
+    labels:
+      safety-filter: enabled
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: safety.filter
+        typed_config:
+          cluster: safety-filter.aiml-monitoring.svc</div>
+</div>
+
+<div class="code-block">
+<div class="code-header"><span class="filename">monitoring-stack.yaml</span><span class="lang">Kubernetes — Observability</span></div>
+<div class="code-body">apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ml-metrics-exporter
+  namespace: aiml-monitoring
+spec:
+  selector:
+    matchLabels:
+      app: ml-metrics-exporter
+  template:
+    metadata:
+      labels:
+        app: ml-metrics-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      containers:
+      - name: exporter
+        image: aiml/perf-monitor:latest
+        ports:
+        - containerPort: 9090
+        env:
+        - name: COLLECT_GPU_METRICS
+          value: "true"
+        - name: COLLECT_INFERENCE_LATENCY
+          value: "true"
+        - name: COLLECT_THROUGHPUT
+          value: "true"
+        - name: ALERT_LATENCY_P99_MS
+          value: "500"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: drift-detector
+  namespace: aiml-monitoring
+spec:
+  schedule: "0 */6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: drift-detector
+            image: aiml/drift-detector:latest
+            env:
+            - name: REFERENCE_DATASET
+              value: "s3://data/reference.parquet"
+            - name: CURRENT_WINDOW
+              value: "6h"
+            - name: DRIFT_THRESHOLD
+              value: "0.05"
+            - name: ALERT_WEBHOOK
+              value: "https://hooks.slack.com/..."
+          restartPolicy: OnFailure</div>
+</div>
+  `;
+}
+
+// ============================================
+// TAB SWITCHING
+// ============================================
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ============================================
+// INIT
+// ============================================
+renderSystems();
+renderPatterns();
+renderPods();
+renderPipelines();
+renderCode();
+</script>
+</body>
+</html>

@@ -2,18 +2,21 @@
 import json
 import os
 import re
+
 os.environ.pop("OTEL_EXPORTER_OTLP_ENDPOINT", None)
 
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 
 
 @pytest.fixture
 def client():
+    """Default client with no forced failures."""
     mock_agent = MagicMock()
     mock_agent.invoke.return_value = {"output": "Echo: hello"}
     from agent.main import create_app
+
     app = create_app(agent=mock_agent)
     app.state.agent = mock_agent  # set before first request (lifespan may run async)
     return TestClient(app)
@@ -62,3 +65,41 @@ def test_invoke_agent_error_propagates(client: TestClient):
     client.app.state.agent.invoke.side_effect = RuntimeError("Agent failed")
     with pytest.raises(RuntimeError, match="Agent failed"):
         client.post("/invoke", json={"message": "hello"})
+
+
+def test_invoke_with_failure_flag_forces_5xx_and_logs_agent_failure(
+    capsys: pytest.CaptureFixture,
+):
+    """With AGENT_FAIL_ALL_REQUESTS enabled, /invoke returns 5xx and logs agent_failure."""
+    mock_agent = MagicMock()
+    mock_agent.invoke.return_value = {"output": "Echo: hello"}  # would be used if not forced to fail
+
+    with patch.dict(os.environ, {"AGENT_FAIL_ALL_REQUESTS": "1"}, clear=False):
+        from agent.main import create_app
+
+        app = create_app(agent=mock_agent)
+        app.state.agent = mock_agent
+        client = TestClient(app)
+        response = client.post("/invoke", json={"message": "hello"})
+
+    assert response.status_code >= 500
+
+    captured = capsys.readouterr()
+    stderr = captured.err
+    error_events = []
+    for line in stderr.strip().split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if obj.get("service") != "otel-demo-agent":
+            continue
+        if obj.get("outcome") != "error":
+            continue
+        error_events.append(obj)
+
+    assert error_events, "Expected at least one error structured log from otel-demo-agent"
+    assert any(e.get("error_type") == "agent_failure" for e in error_events), "Expected error_type=agent_failure in error logs"

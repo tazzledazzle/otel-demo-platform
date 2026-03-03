@@ -1,0 +1,17 @@
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.coverage
+htmlcov/
+notebooks/*.ipynb_checkpoints/
+*.ipynb_checkpoints/
+*.log
+.DS_Store
+chroma_data/
+*.db

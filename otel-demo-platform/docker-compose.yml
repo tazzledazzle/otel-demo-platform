@@ -5,8 +5,9 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: temporal
-      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: ${TEMPORAL_DB_USER:-temporal_demo}
+      POSTGRES_PASSWORD: ${TEMPORAL_DB_PASSWORD:-temporal_demo}
+      POSTGRES_DB: ${TEMPORAL_DB_NAME:-temporal}
     ports:
       - "5432:5432"
     volumes:
@@ -24,8 +25,9 @@ services:
     environment:
       - DB=postgres12
       - DB_PORT=5432
-      - POSTGRES_USER=temporal
-      - POSTGRES_PWD=temporal
+      - POSTGRES_USER=${TEMPORAL_DB_USER:-temporal_demo}
+      - POSTGRES_PWD=${TEMPORAL_DB_PASSWORD:-temporal_demo}
+      - POSTGRES_DB=${TEMPORAL_DB_NAME:-temporal}
       - POSTGRES_SEEDS=postgres
     depends_on:
       postgres:
@@ -39,6 +41,8 @@ services:
       - "4318:4318"   # OTLP HTTP
     environment:
       - ENABLE_LOGS_ALL=false
+      - GF_SECURITY_ADMIN_USER=${OTEL_LGTM_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${OTEL_LGTM_ADMIN_PASSWORD:-admin}
     volumes:
       - otel_lgtm_data:/data
 
