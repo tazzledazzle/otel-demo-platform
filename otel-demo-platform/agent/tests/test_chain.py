@@ -3,7 +3,6 @@ import os
 import pytest
 from unittest.mock import MagicMock, patch
 from langchain_core.messages import AIMessage
-from langchain_core.runnables import RunnableLambda
 
 os.environ.setdefault("OLLAMA_BASE_URL", "http://localhost:11434")
 
@@ -35,10 +34,10 @@ def test_executor_invoke():
 
 
 def test_chain_includes_summarize_step():
-    """Chain (prompt | llm | summarize_step) returns output from new step."""
+    """Tool-calling agent returns output from LLM (mock has bind_tools)."""
     with patch("agent.chain.get_llm") as mock_get_llm:
-        # Use a real runnable so LCEL invokes it; MagicMock is not invoked as a runnable.
-        mock_llm = RunnableLambda(lambda _: AIMessage(content="Summarized reply"))
+        mock_llm = MagicMock()
+        mock_llm.bind_tools.return_value.invoke.return_value = AIMessage(content="Summarized reply")
         mock_get_llm.return_value = mock_llm
         from agent.chain import get_agent_executor
         ex = get_agent_executor()
