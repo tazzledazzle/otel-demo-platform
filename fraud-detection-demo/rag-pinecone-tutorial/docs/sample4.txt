@@ -1,1 +1,0 @@
-Pinecone is a managed vector database. You create an index with a fixed dimension matching your embedding model, then upsert vectors in batches. The free tier supports serverless indexes on AWS or GCP. Use describe_index_stats to verify your index is populated after ingestion.
