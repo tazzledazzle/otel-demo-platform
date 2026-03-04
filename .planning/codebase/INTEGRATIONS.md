@@ -43,7 +43,7 @@
 - Not specified; demo runs locally. Docker Compose for Temporal + otel-lgtm only; API, worker, and agent run as separate processes.
 
 **CI Pipeline:**
-- Not detected in repo (no GitHub Actions or similar under `otel-demo-platform`).
+- GitHub Actions under `.github/workflows/` (CI: unit tests + e2e smoke).
 
 ## Environment Configuration
 

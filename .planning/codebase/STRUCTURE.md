@@ -5,7 +5,7 @@
 ## Directory Layout
 
 ```
-otel-demo-platform/
+(repo root)
 ├── api/                    # Kotlin Ktor API (Temporal client, OTel)
 │   ├── src/main/kotlin/dev/otel/demo/api/
 │   │   ├── Main.kt

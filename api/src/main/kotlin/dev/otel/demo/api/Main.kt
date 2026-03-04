@@ -25,30 +25,18 @@ fun main() {
 }
 
 /**
- * Port resolution:
- * - When API_PORT is set: use it as-is (with a simple parse fallback to 8080).
- * - When API_PORT is unset: try 8080 first, then probe subsequent ports until a free one is found.
+ * Port resolution (Phase 1 preferred defaults):
+ * - When API_PORT is set: use it as-is (parse fallback to 8080).
+ * - When API_PORT is unset: use 8080; fail with a clear message if 8080 is in use.
  */
 private fun resolvePortWithDiscovery(): Int {
     val envPort = System.getenv("API_PORT")
-    if (envPort != null) {
-        return envPort.toIntOrNull() ?: 8080
+    val port = if (envPort != null) envPort.toIntOrNull() ?: 8080 else 8080
+    if (port == 8080 && !isPortAvailable(8080)) {
+        System.err.println("API could not bind to port 8080. Set API_PORT to a different port or stop the other process.")
+        throw IllegalStateException("Port 8080 is in use. Set API_PORT to override.")
     }
-
-    val basePort = 8080
-    val maxAttempts = 20
-
-    for (offset in 0 until maxAttempts) {
-        val candidate = basePort + offset
-        if (isPortAvailable(candidate)) {
-            if (candidate != basePort) {
-                System.err.println("API_PORT not set and 8080 unavailable; using discovered port $candidate.")
-            }
-            return candidate
-        }
-    }
-
-    throw IllegalStateException("Unable to find an available port starting at $basePort (tried $maxAttempts ports).")
+    return port
 }
 
 private fun isPortAvailable(port: Int): Boolean {
