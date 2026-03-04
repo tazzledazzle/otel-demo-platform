@@ -50,7 +50,7 @@ def create_app(agent=None) -> FastAPI:
 
     @app.get("/health")
     def health():
-        return {"status": "ok"}
+        return {"status": "ok", "service": "otel-demo-agent"}
 
     @app.post("/invoke", response_model=InvokeResponse)
     def invoke(request: Request, req: InvokeRequest):

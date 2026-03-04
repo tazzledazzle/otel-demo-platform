@@ -51,16 +51,18 @@ Client → API → Temporal → Worker → Agent (LangChain)
 
 3. **Smoke check** — confirm each service is up before sending chat:
 
-   - **API:** `GET http://localhost:8080/health` — returns `{"status":"ok","service":"otel-demo-api"}`; if you see only `{"status":"ok"}` you may be hitting the Agent.
-   - **Agent:** `GET http://localhost:8000/health`
+   - **API:** `GET http://localhost:8080/health` — returns `{"status":"ok","service":"otel-demo-api"}`.
+   - **Agent:** `GET http://localhost:8000/health` — returns `{"status":"ok","service":"otel-demo-agent"}`.
 
-   Quick validation: `curl -s http://localhost:8080/health` should include `"service":"otel-demo-api"`.
+   Quick validation: `curl -s http://localhost:8080/health` should include `"service":"otel-demo-api"`. If it says `"otel-demo-agent"` instead, a stale Agent process is on port 8080 — kill it and restart.
 
 4. **Send a request**
 
    ```bash
    curl -X POST http://localhost:8080/chat -H "Content-Type: application/json" -d '{"message":"Hello"}'
    ```
+
+   **POST /chat** requires **Temporal**, **Worker**, and **Agent** to be running; until they are up, the API returns **503** with `{"error":"temporal_unavailable",...}`. Use `make run` or start infra then Agent, Worker, and API (see [integration/README.md](integration/README.md)) for the full flow.
 
    Use port **8080** (API preferred default). If you get `404 Not Found` or `{"detail":"Not Found"}`, you are likely hitting the wrong process—check that `GET /health` returns `"service":"otel-demo-api"`. More examples in `test-data/sample_requests.json` (each has a `body` with `"message"` only).
 
@@ -73,7 +75,7 @@ Client → API → Temporal → Worker → Agent (LangChain)
 
 **Troubleshooting**
 
-- **404 or `{"detail":"Not Found"}` on `/chat`** — You are likely hitting the Agent (or another app), not the API. The API returns `{"status":"ok","service":"otel-demo-api"}` for `GET /health`; the Agent returns only `{"status":"ok"}`. Use port 8080 for the API; if 8080 is in use the API fails at startup with a clear message (set `API_PORT` to override). See [CONFIG.md](CONFIG.md).
+- **404 or `{"detail":"Not Found"}` on `/chat`** — You are likely hitting the Agent (or another app), not the API. The API returns `{"status":"ok","service":"otel-demo-api"}` for `GET /health`; the Agent returns `{"status":"ok","service":"otel-demo-agent"}`. Use port 8080 for the API; if 8080 is in use the API fails at startup with a clear message (set `API_PORT` to override). See [CONFIG.md](CONFIG.md).
 - **0 traces in Tempo** — (1) Send at least one request to the API `/chat` (correct port). (2) In TraceQL use `resource.service.name="otel-demo-api"`.
 
 ## Project Layout

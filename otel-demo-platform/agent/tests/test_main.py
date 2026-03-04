@@ -25,7 +25,9 @@ def client():
 def test_health(client: TestClient):
     r = client.get("/health")
     assert r.status_code == 200
-    assert r.json().get("status") == "ok"
+    data = r.json()
+    assert data.get("status") == "ok"
+    assert data.get("service") == "otel-demo-agent"
 
 
 def test_invoke_returns_reply(client: TestClient):
